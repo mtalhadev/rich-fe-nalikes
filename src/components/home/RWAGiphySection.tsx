@@ -46,9 +46,16 @@ export default function RWAGiphySection() {
                     Wally GIFs & Stickers
                   </h3>
                   <div className="w-full h-full relative md:w-fit flex justify-center items-center">
-                    <p className="absolute w-[110%] xs:w-[116%] -right-7 xs:-right-11 -bottom-11 md:static rounded-full text-center md:rounded-xl bg-navy shadow-md shadow-amber-50/40 text-base md:text-lg font-luckiest-guy cursor-pointer px-3 md:px-4 py-2.5 md:w-fit border">
-                      Explore Now
-                    </p>
+                    <a
+                      href="https://memedepot.com/d/rich-whale-alliance"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                    >
+                      <p className="absolute w-[110%] xs:w-[116%] -right-7 xs:-right-11 -bottom-11 md:static rounded-full text-center md:rounded-xl bg-navy shadow-md shadow-amber-50/40 text-base md:text-lg font-luckiest-guy cursor-pointer px-3 md:px-4 py-2.5 md:w-fit border hover:bg-navy/90 transition-colors">
+                        Explore Now
+                      </p>
+                    </a>
                   </div>
                 </div>
 
@@ -67,22 +74,21 @@ export default function RWAGiphySection() {
           {/* Mobile Layout - Horizontal Scroll */}
           <div className="md:hidden">
             <div className="flex overflow-x-auto gap-3 mt-8 px-4 scrollbar-hide">
-              {Images.filter(val => val).slice(0, 8).map((val, i) => (
-                <div
-                  key={i}
-                  className="flex-shrink-0"
-                >
-                  <div className="p-2 rounded-lg h-[80px] w-[80px] bg-white overflow-hidden shadow-md">
-                    <Image
-                      src={val}
-                      width={60}
-                      height={60}
-                      alt={`GIF ${i + 1}`}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
+              {Images.filter((val) => val)
+                .slice(0, 8)
+                .map((val, i) => (
+                  <div key={i} className="flex-shrink-0">
+                    <div className="p-2 rounded-lg h-[80px] w-[80px] bg-white overflow-hidden shadow-md">
+                      <Image
+                        src={val}
+                        width={60}
+                        height={60}
+                        alt={`GIF ${i + 1}`}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
 

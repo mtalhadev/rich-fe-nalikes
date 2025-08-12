@@ -132,8 +132,10 @@ const VaultCard: React.FC<VaultCardProps> = ({
     formatTime,
   } = useWalletOperations();
   const [activeButton, setActiveButton] = useState<ButtonState>("stake");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("CONNECT WALLET");
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [stakeAmount, setStakeAmount] = useState("0");
   const [unstakeTimer, setUnstakeTimer] = useState("00:00:00");
   const [canUnstake, setCanUnstake] = useState(false);
@@ -270,13 +272,25 @@ const VaultCard: React.FC<VaultCardProps> = ({
     };
   }, [isConnected]);
 
-  const getButtonStyles = (buttonType: ButtonState) => {
-    const baseStyles =
-      "flex-1 font-normal py-1 rounded-lg flex items-center justify-center gap-1 font-luckiest-guy text-[15px] transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg";
-    return activeButton === buttonType
-      ? `${baseStyles} bg-primary-blue text-white shadow-md`
-      : `${baseStyles} bg-[#B8CEFF] text-primary-blue border border-primary-blue hover:bg-[#A3C0FF] hover:border-[#002A8C]`;
-  };
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   const getValueFromKey = (key: string) => {
     const valueMap = {
@@ -294,13 +308,11 @@ const VaultCard: React.FC<VaultCardProps> = ({
   };
 
   const renderStatsSection = () => (
-    <div className="bg-dark-blue rounded-lg px-3 md:px-4 py-3 text-white font-semibold mb-4">
-      <div className="border-b-2 border-[#759CF3] flex justify-between items-center">
-        <div className="flex flex-col">
-          <span className="text-xs font-poppins font-semibold">
-            Total Staked
-          </span>
-          <span className="font-normal font-luckiest-guy text-lg">
+    <div className="bg-white w-full rounded-xl md:rounded-2xl px-4 md:px-6 py-5 text-white font-semibold mb-4">
+      <div className="flex justify-between items-center text-navy">
+        <div className="flex flex-col gap-6">
+          <span className="font-poppins font-semibold">Total Staked</span>
+          <span className="font-normal font-luckiest-guy text-5xl">
             <NumericFormat
               value={totalStaked || 0}
               thousandSeparator
@@ -309,27 +321,30 @@ const VaultCard: React.FC<VaultCardProps> = ({
             />
           </span>
         </div>
-        <div className="w-px h-5 my-auto bg-white mx-2" />
-        <div className="flex flex-col">
-          <span className="text-xs font-poppins font-semibold">
-            Your Staked
-          </span>
-          <span className="font-normal font-luckiest-guy text-end text-lg">
+        {/* <div className="w-px h-5 my-auto bg-white mx-2" /> */}
+        <Image
+          src="/linear-line-new.svg"
+          alt="linear-line"
+          width={1000}
+          height={1000}
+          className="w-px h-full"
+        />
+        <div className="flex flex-col gap-6">
+          <span className="renderStatsSection">Your Staked</span>
+          <span className="font-normal font-alfa text-5xl">
             <NumericFormat
               value={userStakedBalance}
               thousandSeparator
               displayType="text"
               decimalScale={2}
-            />{" "}
-            <span className="text-[#759CF3]">
-              /{" "}
-              <NumericFormat
-                value={stakedAmount}
-                thousandSeparator
-                displayType="text"
-                decimalScale={2}
-              />
-            </span>
+            />
+            /
+            <NumericFormat
+              value={stakedAmount}
+              thousandSeparator
+              displayType="text"
+              decimalScale={2}
+            />
           </span>
         </div>
       </div>
@@ -337,59 +352,110 @@ const VaultCard: React.FC<VaultCardProps> = ({
   );
 
   const renderInputSection = () => (
-    <div className="bg-[#B8CEFF] rounded-lg flex flex-col px-3 py-2 mb-4 border border-[#0036AE] shadow-[3px_3px_0_0_#0036AE]">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1">
-          <input
-            type="number"
-            value={stakeAmount}
-            onChange={(e) => {
-              const value = parseFloat(e.target.value) || 0;
-              const clampedValue = Math.min(Math.max(value, 0), maxStakeAmount);
-              setStakeAmount(clampedValue.toString());
-            }}
-            placeholder="0.0"
-            min="0"
-            max={maxStakeAmount}
-            disabled={maxStakeAmount === 0}
-            className="font-luckiest-guy font-normal text-primary-blue text-base md:text-lg bg-transparent border-none outline-none w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 transition-all duration-200 ease-in-out focus:scale-[1.02]"
+    <>
+      <div className="bg-[#78B9DF] w-full rounded-xl md:rounded-2xl px-4 md:px-6 py-3.5 text-white font-semibold mb-4">
+        <div className="flex justify-between items-center text-navy">
+          <div className="flex flex-col gap-4">
+            <span className="font-poppins font-semibold">You Will Stake</span>
+            <span className="font-normal font-luckiest-guy text-5xl">
+              <input
+                type="number"
+                value={stakeAmount}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value) || 0;
+                  const clampedValue = Math.min(
+                    Math.max(value, 0),
+                    maxStakeAmount
+                  );
+                  setStakeAmount(clampedValue.toString());
+                }}
+                placeholder="0.0"
+                min="0"
+                max={maxStakeAmount}
+                disabled={maxStakeAmount === 0}
+                className="h-fit p-0 text-5xl m-0 leading-0 font-normal bg-transparent border-none outline-none w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 transition-all duration-200 ease-in-out focus:scale-[1.02]"
+              />
+            </span>
+          </div>
+          {/* <div className="w-px h-5 my-auto bg-white mx-2" /> */}
+          <Image
+            src="/linear-line-new2.svg"
+            alt="linear-line"
+            width={1000}
+            height={1000}
+            className="w-px h-full"
           />
-        </div>
-        <div className="flex items-center">
-          <span className="mx-2 text-white font-normal font-luckiest-guy text-lg">
-            {tokenSymbol}
-          </span>
-          <Image src="/logo.svg" alt="logo" width={25} height={25} />
+          <div className="flex flex-col gap-6">
+            <span className="renderStatsSection">RWA</span>
+            <span className="font-normal font-alfa text-5xl">
+              <NumericFormat
+                value={userBalance}
+                thousandSeparator
+                displayType="text"
+                decimalScale={3}
+              />
+              <span className="text-lg">RWA</span>
+            </span>
+          </div>
         </div>
       </div>
-      <div className="flex items-center justify-between">
-        <p className="font-poppins font-normal text-[8px] text-white">
-          You Will Stake
-        </p>
-        <div className="flex items-center gap-1 mt-0.5">
-          <Image src="/wallet.svg" alt="wallet" width={12} height={12} />
-
-          <p className="font-poppins font-normal text-[8px] text-primary-blue">
-            <NumericFormat
-              value={userBalance}
-              thousandSeparator
-              displayType="text"
-              decimalScale={3}
-            />{" "}
+      {/* <div className="bg-[#B8CEFF] rounded-lg flex flex-col px-3 py-2 mb-4 border border-[#0036AE] shadow-[3px_3px_0_0_#0036AE]">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <input
+              type="number"
+              value={stakeAmount}
+              onChange={(e) => {
+                const value = parseFloat(e.target.value) || 0;
+                const clampedValue = Math.min(
+                  Math.max(value, 0),
+                  maxStakeAmount
+                );
+                setStakeAmount(clampedValue.toString());
+              }}
+              placeholder="0.0"
+              min="0"
+              max={maxStakeAmount}
+              disabled={maxStakeAmount === 0}
+              className="font-luckiest-guy font-normal text-primary-blue text-base md:text-lg bg-transparent border-none outline-none w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 transition-all duration-200 ease-in-out focus:scale-[1.02]"
+            />
+          </div>
+          <div className="flex items-center">
+            <span className="mx-2 text-white font-normal font-luckiest-guy text-lg">
+              {tokenSymbol}
+            </span>
+            <Image src="/logo.svg" alt="logo" width={25} height={25} />
+          </div>
+        </div>
+        <div className="flex items-center justify-between">
+          <p className="font-poppins font-normal text-[8px] text-white">
+            You Will Stake
           </p>
-          <span className="font-poppins font-medium text-primary-blue text-[8px]">
-            {tokenSymbol}
-          </span>
-          <button
-            className="bg-[#759CF3] text-dark-blue py-0.5 px-1.5 rounded-[2px] font-medium text-[6px] font-poppins hover:bg-[#5A8BE8] transition-all duration-200 ease-in-out transform hover:scale-110 hover:shadow-sm disabled:opacity-50 disabled:hover:scale-100"
-            onClick={() => setStakeAmount(userBalance)}
-            disabled={maxStakeAmount === 0}
-          >
-            MAX
-          </button>
+          <div className="flex items-center gap-1 mt-0.5">
+            <Image src="/wallet.svg" alt="wallet" width={12} height={12} />
+
+            <p className="font-poppins font-normal text-[8px] text-primary-blue">
+              <NumericFormat
+                value={userBalance}
+                thousandSeparator
+                displayType="text"
+                decimalScale={3}
+              />{" "}
+            </p>
+            <span className="font-poppins font-medium text-primary-blue text-[8px]">
+              {tokenSymbol}
+            </span>
+            <button
+              className="bg-[#759CF3] text-dark-blue py-0.5 px-1.5 rounded-[2px] font-medium text-[6px] font-poppins hover:bg-[#5A8BE8] transition-all duration-200 ease-in-out transform hover:scale-110 hover:shadow-sm disabled:opacity-50 disabled:hover:scale-100"
+              onClick={() => setStakeAmount(userBalance)}
+              disabled={maxStakeAmount === 0}
+            >
+              MAX
+            </button>
+          </div>
         </div>
-      </div>
-    </div>
+      </div> */}
+    </>
   );
 
   const renderInfoSection = (data: any) => (
@@ -482,127 +548,180 @@ const VaultCard: React.FC<VaultCardProps> = ({
     const config = CONTENT_CONFIG[activeButton];
 
     return (
-      <div className="flex flex-col justify-between sm:h-[270px]">
-        <div>
+      <div className="flex flex-col justify-between sm:h-fit gap-6">
+        <div className="flex flex-col md:flex-row w-full gap-8">
           {config.sections.map((section, idx) => {
             switch (section.type) {
               case "stats":
-                return <div key={idx}>{renderStatsSection()}</div>;
+                return (
+                  <div key={idx} className="w-full">
+                    {renderStatsSection()}
+                  </div>
+                );
               case "input":
-                return <div key={idx}>{renderInputSection()}</div>;
+                return (
+                  <div key={idx} className="w-full">
+                    {renderInputSection()}
+                  </div>
+                );
               case "info":
-                return <div key={idx}>{renderInfoSection(section.data)}</div>;
+                return (
+                  <div key={idx} className="w-full">
+                    {renderInfoSection(section.data)}
+                  </div>
+                );
               case "unstack":
                 return (
-                  <div key={idx}>{renderUnstackSection(section.data)}</div>
+                  <div key={idx} className="w-full">
+                    {renderUnstackSection(section.data)}
+                  </div>
                 );
               default:
                 return null;
             }
           })}
         </div>
-        <button
-          onClick={async () => {
-            if (!isConnected) {
-              await connectWallet();
-            } else {
-              switch (activeButton) {
-                case "stake":
-                  const stakeValidationError = validateStakeAmount(stakeAmount);
-                  if (stakeValidationError) {
-                    console.error(stakeValidationError);
-                    return;
-                  }
-                  handleStake(stakeAmount);
-                  break;
-                case "unstake":
-                  if (!canUnstake) {
-                    showToast(
-                      "error",
-                      "Cannot unstake yet. Timer must reach 00:00:00."
-                    );
-                    return;
-                  }
-                  const unstakeValidationError = validateUnstake();
-                  if (unstakeValidationError) {
-                    console.error(unstakeValidationError);
-                    return;
-                  }
-                  handleUnstake();
-                  break;
-                case "claim":
-                  const claimValidationError = validateClaim();
-                  if (claimValidationError) {
-                    console.error(claimValidationError);
-                    return;
-                  }
-                  handleClaim();
-                  break;
-              }
-            }
-          }}
-          disabled={activeButton === "unstake" && !canUnstake}
-          className={`w-full border border-[#0036AE] text-white py-2 rounded-lg text-[25px] shadow-blue-3 font-luckiest-guy font-normal btn-shine transition-all duration-300 ease-in-out transform hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] ${
-            activeButton === "unstake" && !canUnstake
-              ? "bg-gray-400 cursor-not-allowed opacity-50"
-              : "bg-gradient-to-r from-[#0036AE] to-[#759CF3] hover:from-[#002A8C] hover:to-[#5A8BE8]"
+        <div
+          className={`w-full flex justify-start ${
+            days === 45 ? "md:justify-start" : "md:justify-end"
           }`}
         >
-          {buttonLabel}
-        </button>
+          <button
+            onClick={async () => {
+              if (!isConnected) {
+                await connectWallet();
+              } else {
+                switch (activeButton) {
+                  case "stake":
+                    const stakeValidationError =
+                      validateStakeAmount(stakeAmount);
+                    if (stakeValidationError) {
+                      console.error(stakeValidationError);
+                      return;
+                    }
+                    handleStake(stakeAmount);
+                    break;
+                  case "unstake":
+                    if (!canUnstake) {
+                      showToast(
+                        "error",
+                        "Cannot unstake yet. Timer must reach 00:00:00."
+                      );
+                      return;
+                    }
+                    const unstakeValidationError = validateUnstake();
+                    if (unstakeValidationError) {
+                      console.error(unstakeValidationError);
+                      return;
+                    }
+                    handleUnstake();
+                    break;
+                  case "claim":
+                    const claimValidationError = validateClaim();
+                    if (claimValidationError) {
+                      console.error(claimValidationError);
+                      return;
+                    }
+                    handleClaim();
+                    break;
+                }
+              }
+            }}
+            disabled={activeButton === "unstake" && !canUnstake}
+            className="w-full md:w-fit bg-gradient-to-r btn-shine from-[#1AD3E4] text-nowrap md:text-xl lg:text-lg to-[#005FEB] border-2 border-secondary cursor-pointer text-white px-2.5 sm:px-4 md:px-6 py-2 lg:py-1.5 rounded-xl xs:rounded-2xl lg:rounded-lg font-luckiest-guy hover:opacity-90 transition-opacity"
+          >
+            {buttonLabel}
+          </button>
+        </div>
       </div>
     );
   };
 
   return (
     <div
-      className={`bg-light-blue border border-primary-blue rounded-[10px] p-4 md:p-6 w-full md:w-[400px] sm:h-auto mx-auto md:mx-0 shadow-blue-custom transition-all duration-300 ease-in-out hover:shadow-xl hover:scale-[1.01] ${
-        mounted ? "slide-in-left" : ""
-      }`}
+      className={`relative bg-[#CDDCFF] bg-[url('/stake-box-bg.svg')] bg-no-repeat bg-contain bg-top-left rounded-2xl md:rounded-[44px] p-4 md:p-6 w-full sm:h-auto mx-auto md:mx-0`}
     >
       {/* Header */}
-      <div className="flex justify-between items-center mb-4 gap-2">
-        <div className="bg-[#FFE2B0] text-center rounded-md px-2 md:px-4 py-1 text-primary-blue font-luckiest-guy text-2xl md:text-[32px] flex-1 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md">
-          {`${days} DAYS VAULT`}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-8 w-full">
+        <div className="flex items-center gap-4 w-full justify-start">
+          <div className="rounded-md px-2 md:px-4 py-1 text-primary-blue text-sm sm:text-xl md:text-3xl font-alfa">
+            {`${days} DAYS VAULT`}
+          </div>
+          <div className="rounded-3xl flex gap-1 items-center text-sm text-white justify-center px-4 py-2 bg-[#78B9DF]">
+            <p className="font-normal text-center leading-none font-luckiest-guy">
+              {apy}%
+            </p>
+            <p className="text-center font-poppins font-bold">APY</p>
+          </div>
         </div>
-        <div className="bg-[#FFE2B0] rounded-md px-2 py-1 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md">
-          <p className="text-primary-blue font-normal text-sm md:text-2xl text-center leading-none font-luckiest-guy">
-            {apy}%
-          </p>
-          <p className="text-[10px] md:text-[14px] text-center font-poppins text-primary-blue font-bold">
-            APY
-          </p>
-        </div>
-      </div>
 
-      {/* Action Buttons */}
-      <div className="flex flex-col md:flex-row gap-2 mb-4">
-        {(Object.keys(BUTTON_CONFIG) as ButtonState[]).map((buttonType) => {
-          const config = BUTTON_CONFIG[buttonType];
-          const isActive = activeButton === buttonType;
-
-          return (
-            <button
-              key={buttonType}
-              className={getButtonStyles(buttonType)}
-              onClick={() => setActiveButton(buttonType)}
+        {/* Action Dropdown */}
+        <div ref={dropdownRef} className="relative mb-4 w-full md:w-fit">
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="w-full md:w-fit bg-[#0036AE] text-white px-4 py-2 rounded-2xl font-luckiest-guy flex items-center gap-4 md:gap-10 justify-between shadow-lg"
+          >
+            <div className="flex items-center gap-3">
+              <span>{BUTTON_CONFIG[activeButton].label}</span>
+            </div>
+            <svg
+              className={`w-5 h-5 transition-transform duration-200 ${
+                isDropdownOpen ? "rotate-180" : ""
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <Image
-                src={isActive ? config.activeIcon : config.inactiveIcon}
-                alt={buttonType}
-                width={12}
-                height={12}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
               />
-              <span>{config.label}</span>
-            </button>
-          );
-        })}
+            </svg>
+          </button>
+
+          {/* Dropdown Menu */}
+          {isDropdownOpen && (
+            <div className="absolute top-full left-0 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-10">
+              {(Object.keys(BUTTON_CONFIG) as ButtonState[]).map(
+                (buttonType) => {
+                  const config = BUTTON_CONFIG[buttonType];
+                  const isActive = activeButton === buttonType;
+
+                  return (
+                    <button
+                      key={buttonType}
+                      className={`w-full px-4 py-2 flex items-center gap-3 font-luckiest-guy text-left transition-all duration-200 ${
+                        isActive
+                          ? "bg-[#0036AE] text-white"
+                          : "text-[#0036AE] hover:bg-[#F1F5F9] border-b border-gray-100 last:border-b-0"
+                      }`}
+                      onClick={() => {
+                        setActiveButton(buttonType);
+                        setIsDropdownOpen(false);
+                      }}
+                    >
+                      <Image
+                        src={isActive ? config.activeIcon : config.inactiveIcon}
+                        alt={buttonType}
+                        width={16}
+                        height={16}
+                      />
+                      <span>{config.label}</span>
+                    </button>
+                  );
+                }
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Chain Status Indicator */}
       {isConnected && !isOnCorrectChain && (
-        <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 rounded-lg">
-          <p className="text-yellow-800 text-sm font-medium">
+        <div className="mb-4 p-3 bg-navy text-white rounded-lg border border-yellow-400">
+          <p className="text-yellow-400 text-sm font-medium">
             ⚠️ Please switch to Abstract to continue
           </p>
         </div>
@@ -610,6 +729,25 @@ const VaultCard: React.FC<VaultCardProps> = ({
 
       {/* Dynamic Content */}
       {renderContent()}
+
+      {days === 45 && (
+        <Image
+          src="/45days-bunny.svg"
+          alt="stake-box-bg"
+          width={1000}
+          height={1000}
+          className="absolute hidden md:block -bottom-28 -right-10 w-24 h-full"
+        />
+      )}
+      {days === 90 && (
+        <Image
+          src="/90days-bunny.svg"
+          alt="stake-box-bg"
+          width={1000}
+          height={1000}
+          className="absolute hidden md:block -bottom-40 -left-8 w-24 h-full"
+        />
+      )}
     </div>
   );
 };

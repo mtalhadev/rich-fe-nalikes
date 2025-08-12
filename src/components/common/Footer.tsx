@@ -52,6 +52,22 @@ export default function Footer() {
                 </div>
                 <div className="flex items-center gap-2 md:gap-3">
                   <Image
+                    src="/icons/footer-telegram.svg"
+                    alt="X"
+                    width={20}
+                    height={20}
+                    className="w-5 h-5"
+                  />
+                  <a
+                    href="https://t.me/RWAlliance"
+                    target="_blank"
+                    className="block text-[#0036AE] text-sm md:text-base font-nunito-sans text-wrap w-full break-words xl:break-normal underline"
+                  >
+                    https://t.me/RWAlliance
+                  </a>
+                </div>
+                <div className="flex items-center gap-2 md:gap-3">
+                  <Image
                     src="/icons/footer-wallet.svg"
                     alt="X"
                     width={20}
@@ -59,7 +75,8 @@ export default function Footer() {
                     className="w-5 h-5"
                   />
                   <a
-                    href="#"
+                    href="https://dexscreener.com/abstract/0x9d735b41918b3fc495c7de540f7213a979050859"
+                    target="_blank"
                     className="block text-[#0036AE] text-sm md:text-base font-nunito-sans text-wrap w-full break-words xl:break-normal underline"
                   >
                     0xAf31d07AF1602Dfce07Fba81BcA5F9570CA83983

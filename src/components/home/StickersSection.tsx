@@ -7,7 +7,7 @@ export default function StickersSection() {
       id="stickers"
       className="w-full relative max-w-7xl mx-auto px-4 md:px-16"
     >
-      <div className="relative overflow-hidden md:overflow-visible text-center lg:text-left h-[470px] md:h-[480px] lg:h-[420px] flex flex-col justify-evenly bg-gradient-btn rounded-3xl md:rounded-4xl">
+      <div className="relative overflow-hidden md:overflow-visible text-center lg:text-left h-[550px] md:h-[480px] lg:h-[420px] flex flex-col justify-evenly bg-gradient-btn rounded-3xl md:rounded-4xl">
         <div className="w-full md:w-[70%] space-y-8 md:space-y-14 lg:space-y-14 md:absolute h-fit top-0 left-0 px-4 md:px-5 lg:px-10 py-6 md:py-8 lg:py-12 z-40">
           <div className="space-y-3 md:space-y-4">
             <h2 className="text-white text-2xl md:text-4xl lg:text-5xl xl:text-6xl text-wrap font-noto-sans font-bold mb-4 md:mb-6 lg:mb-4 uppercase leading-tight text-center md:text-left">
@@ -21,10 +21,10 @@ export default function StickersSection() {
           </div>
 
           {/* Platform Links */}
-          <div className="hidden md:flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 lg:gap-3 w-fit mx-auto md:mx-0">
+          <div className="flex flex-col sm:flex-row justify-center flex-wrap gap-3 sm:gap-4 lg:gap-3 w-full items-center md:w-fit mx-auto md:mx-0">
             <Link
               href={"https://t.me/RWAlliance"}
-              className="bg-white rounded-lg px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 lg:py-3 flex items-center justify-center gap-2 min-h-[40px] sm:min-h-[48px] touch-manipulation"
+              className="bg-white w-[60%] md:w-fit rounded-lg px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 lg:py-3 flex items-center justify-center gap-2 min-h-[40px] sm:min-h-[48px] touch-manipulation"
             >
               <Image
                 src="/icons/telegram.svg"
@@ -56,18 +56,6 @@ export default function StickersSection() {
               alt="Phone Mockup"
               className="h-fit w-72 md:hidden block pl-7"
             />
-            <Link
-              href={"https://t.me/RWAlliance"}
-              className="absolute -top-10 left-3 z-40 sm:left-14"
-            >
-              <Image
-                src="/icons/wally-telegram.svg"
-                width={701}
-                height={780}
-                alt="icon"
-                className="h-fit w-8 md:hidden block"
-              />
-            </Link>
           </div>
         </div>
 

@@ -11,12 +11,19 @@ import RWAGiphySection from "@/components/home/RWAGiphySection";
 import RWATicker from "@/components/home/RWATicker";
 import StickersSection from "@/components/home/StickersSection";
 import TotalStakedSection from "@/components/home/TotalStakedSection";
+import { useState } from "react";
+
 export default function Page() {
+  const [isStakingPopupOpen, setIsStakingPopupOpen] = useState(false);
+
   return (
     <>
-      <HeroSection />
+      <HeroSection
+        isStakingPopupOpen={isStakingPopupOpen}
+        setIsStakingPopupOpen={setIsStakingPopupOpen}
+      />
       {/* Staking Section */}
-      <TotalStakedSection />
+      <TotalStakedSection onStakeClick={() => setIsStakingPopupOpen(true)} />
 
       {/* RWA Separator */}
       {/* <RWASeperator /> */}

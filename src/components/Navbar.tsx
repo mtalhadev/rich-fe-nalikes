@@ -1,33 +1,47 @@
 "use client";
-import "@rainbow-me/rainbowkit/styles.css";
-import Image from "next/image";
+
+import RWALogo from "@/../public/rwa-nav-logo.svg";
+import HeroSection from "@/components/HeroSection";
 import { useWallet } from "@/contexts/WalletContext";
+import Image from "next/image";
+import Link from "next/link";
 
-const Navbar = () => {
+export default function Navbar() {
   const { isConnected, connectWallet, connectWalletLabel } = useWallet();
-
   return (
-    <div className="relative z-10 w-full flex items-center justify-between px-4 md:px-6 pt-6 max-w-[1100px] mx-auto">
-      <div className="flex items-center gap-2">
-        <Image
-          src="/logo.svg"
-          alt="Logo"
-          width={45}
-          height={45}
-          className="md:w-[45px] md:h-[45px]"
-        />
-        <span className="text-base md:text-[25px] text-primary-blue font-normal font-luckiest-guy">
-          RWA
-        </span>
+    <div className="sm:bg-[url('/stake-bg-desktop.svg')] bg-[url('/stake-bg-desktop.svg')] bg-no-repeat bg-contain sm:bg-cover sm:bg-[position:center_-70px] flex flex-col md:gap-y-4 lg:gap-y-3 items-center py-4 lg:py-3 w-full h-[52vh] xs:h-[45vh] md:h-[80vh] lg:h-[90vh] relative">
+      <div className="max-w-7xl w-full mx-auto px-2 xs:px-4 sm:px-8 md:px-12 lg:px-18 flex flex-col h-fit items-center justify-between">
+        <div className="w-full flex items-center justify-between gap-12">
+          <div className="md:w-36 md:h-28 lg:w-32 lg:h-24 h-fit w-fit">
+            <Image
+              src={RWALogo}
+              width={248}
+              height={91}
+              alt="RWA Logo"
+              className="w-full h-10 sm:h-full object-contain"
+            />
+          </div>
+          <div className="flex items-center gap-x-2 md:gap-x-6">
+            <Link
+              href={
+                "https://swap.reservoir.tools/#/swap?chain=abstract&outputCurrency=0xAf31d07AF1602Dfce07Fba81BcA5F9570CA83983"
+              }
+            >
+              <button className="bg-gradient-to-r btn-shine from-[#1AD3E4] text-xs sm:text-sm  text-nowrap md:text-xl lg:text-lg to-[#005FEB] border-2 border-secondary cursor-pointer text-white px-2.5 sm:px-4 md:px-6 py-1 xs:py-2 lg:py-1.5 rounded-lg xs:rounded-xl lg:rounded-lg font-luckiest-guy hover:opacity-90 transition-opacity">
+                {"Buy RWA"}
+              </button>
+            </Link>
+            <button
+              onClick={connectWallet}
+              className="bg-gradient-to-r btn-shine from-[#1AD3E4] text-xs sm:text-sm text-nowrap md:text-xl lg:text-lg to-[#005FEB] border-2 border-secondary cursor-pointer text-white px-2.5 sm:px-4 md:px-6 py-1 xs:py-2 lg:py-1.5 rounded-lg xs:rounded-xl lg:rounded-lg font-luckiest-guy hover:opacity-90 transition-opacity"
+            >
+              {connectWalletLabel}
+            </button>
+          </div>
+        </div>
+
+        <HeroSection />
       </div>
-      <button
-        className="bg-accent-yellow font-luckiest-guy text-primary-blue font-normal py-1.5 md:py-2 px-3 md:px-4 rounded-lg shadow-blue-4 transition-all text-sm md:text-brand-md lg:text-[25px] btn-shine hover:scale-105 active:scale-95"
-        onClick={connectWallet}
-      >
-        {connectWalletLabel}
-      </button>
     </div>
   );
-};
-
-export default Navbar;
+}

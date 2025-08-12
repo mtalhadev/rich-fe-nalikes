@@ -1,11 +1,7 @@
 "use client";
 
-import Image from "next/image";
-import { Poppins } from "next/font/google";
-import StatsCard from "./StatsCard";
 import { useWallet } from "@/contexts/WalletContext";
-import { formatLargeNumber } from "../../utils/helpers";
-import { useState, useEffect, useMemo } from "react";
+import { Poppins } from "next/font/google";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -17,41 +13,85 @@ export default function HeroSection() {
 
   const totalStaked = userBalances?.stakedTokenBalanceContract || "0";
 
-  const stats = useMemo(
-    () => [
-      { value: `${formatLargeNumber(totalStaked)} RWA`, label: "Total Staked" },
-      { value: "300M+ REWARDS", label: "Total Rewards" },
-    ],
-    [totalStaked]
-  );
-
   return (
-    <section className="relative w-full sm:pb-8  max-w-[1100px] mx-auto z-10 px-4 md:px-0">
+    <section className="relative w-full sm:pb-8 z-10 mt-6 md:mt-0">
       {/* Top Row: Logo, Badge, Button */}
-
       <div className="w-full flex flex-col md:flex-row items-center justify-between max-w-6xl mx-auto mt-5 relative">
-        <div className="flex-1 flex flex-col items-start gap-4 px-2 md:px-6">
-          <div className="bg-accent-yellow font-luckiest-guy text-primary-blue font-normal py-2 px-4 rounded-lg shadow-blue-4 transition-all text-xs w-fit flex items-center gap-2 sm:mt-8 mt-4">
-            <Image src="/abstract.png" alt="Abstract" width={10} height={9} />
-            <h1 className="text-[12px] mt-0.5">Powered by Abstract</h1>
-          </div>
+        <div className="flex-1 flex flex-col items-center gap-2 md:gap-6 px-2 md:px-6">
           <h1
-            className={`text-2xl md:text-4xl lg:text-6xl font-bold text-white drop-shadow-[3px_3px_0_#1E355E] leading-tight font-poppins text-stroke sm:mt-8 mt-4`}
+            className={`text-3xl text-center md:text-4xl lg:text-6xl text-white drop-shadow-[0.5px_0.5px_0_#1E355E] font-black leading-tight font-noto-sans text-stroke sm:mt-4`}
           >
-            STAKE $RWA & EARN REWARDS
+            STAKE RWA & EARN REWARDS
           </h1>
           <p
-            className={`text-sm md:text-base lg:text-[25px] text-dark-blue font-semibold max-w-2xl font-poppins sm:mt-0 mt-6`}
+            className={`text-sm text-center md:text-base lg:text-xl text-dark-blue font-semibold sm:mt-0 mt-5`}
           >
-            Lock your $RWA tokens in the vaults to earn rewards{" "}
-            <br className="hidden md:block" />
-            paid out in $RWA
+            Lock your $RWA tokens in the vaults to earn rewards paid out in RWA
           </p>
           {/* Stats Row */}
-          <div className="flex flex-col md:flex-row gap-4 mt-4 w-full">
-            {stats.map((stat, idx) => (
-              <StatsCard key={idx} value={stat.value} label={stat.label} />
-            ))}
+          <div className="flex flex-col md:flex-row md:justify-center items-center gap-5 mt-4 w-full">
+            {/* Mobile Layout - Vertical Stack */}
+            <div className="flex flex-col gap-y-3 md:hidden w-full px-4">
+              {/* First Row - Total Staked and Total Rewards */}
+              <div className="flex gap-x-3 w-full">
+                {/* Total Staked Card */}
+                <div className="flex-1 rounded-2xl bg-[#CDDCFF] p-4 flex flex-col justify-between min-h-[100px]">
+                  <h1 className="font-luckiest-guy text-sm text-navy uppercase leading-tight">
+                    Total Staked
+                  </h1>
+                  <div className="flex items-end gap-x-1 mt-2">
+                    <span className="text-3xl leading-none font-luckiest-guy text-[#2e6385]">
+                      {totalStaked}
+                    </span>
+                    <span className="font-luckiest-guy text-xs text-navy mb-1">
+                      RWA
+                    </span>
+                  </div>
+                </div>
+
+                {/* Total Rewards Card */}
+                <div className="flex-1 rounded-2xl bg-[#286CCB] p-4 flex flex-col justify-between min-h-[100px]">
+                  <h1 className="font-luckiest-guy text-sm text-white uppercase leading-tight">
+                    Total Rewards
+                  </h1>
+                  <div className="flex items-end gap-x-1 mt-2">
+                    <span className="text-3xl leading-none font-luckiest-guy text-white">
+                      300M+
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Desktop Layout - Horizontal */}
+            <div className="hidden md:flex justify-center items-center gap-x-6 w-full lg:px-0">
+              {/* Total Staked Card */}
+              <div className="min-w-[200px] w-fit h-full gap-y-6 rounded-3xl bg-[#CDDCFF] p-6 flex flex-col justify-between relative flex-shrink-0">
+                <h1 className="font-luckiest-guy text-2xl text-navy uppercase">
+                  Total Staked
+                </h1>
+                <div className="flex items-end gap-x-2">
+                  <span className="text-6xl leading-none font-luckiest-guy text-dark-gray">
+                    {totalStaked}
+                  </span>
+                  <span className="font-luckiest-guy text-xl text-navy mb-2">
+                    RWA
+                  </span>
+                </div>
+              </div>
+
+              {/* Total Rewards Card */}
+              <div className="min-w-[200px] w-fit h-full gap-y-6 rounded-3xl bg-[#286CCB] p-6 flex flex-col justify-between relative flex-shrink-0">
+                <h1 className="font-luckiest-guy text-2xl text-white uppercase">
+                  Total Rewards
+                </h1>
+                <div className="flex items-end gap-x-2">
+                  <span className="text-6xl leading-none font-luckiest-guy text-white">
+                    300M+
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

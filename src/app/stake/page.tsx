@@ -1,3 +1,4 @@
+import Footer from "@/components/common/Footer";
 import HeroSection from "@/components/HeroSection";
 import Navbar from "@/components/Navbar";
 import Ticker from "@/components/Ticker";
@@ -6,10 +7,10 @@ import VaultCard from "@/components/VaultCard";
 export default function Home() {
   return (
     <div>
-      <Ticker />
+      {/* <Ticker /> */}
       <Navbar />
-      <HeroSection />
-      <main className="max-w-[1100px] mx-auto relative z-10 flex flex-col md:flex-row gap-10 px-6 mt-10">
+      {/* <HeroSection /> */}
+      <main className="max-w-7xl mb-24 mx-auto relative z-10 flex flex-col w-full gap-10 px-6 md:px-20 mt-10">
         <VaultCard
           vaultName="45 DAYS VAULT"
           totalStaked={0}
@@ -36,13 +37,7 @@ export default function Home() {
         />
       </main>
 
-      <div className="w-full bg-dark-blue h-1 shadow-blue-2 mt-16 mb-8 max-w-[1250px] mx-auto" />
-      <p
-        className="text-dark-blue text-center font-spline-sans-mono font-bold mb-8 px-4 md:px-0"
-        style={{ lineHeight: "23px", letterSpacing: "0%" }}
-      >
-        Copyright © 2025 -- Rich Whale Alliance. All rights reserved
-      </p>
+      <Footer />
     </div>
   );
 }

@@ -12,12 +12,19 @@ export default function MemesTooSection() {
             Because Walls Need <br />
             Memes Too
           </h1>
-          <button
-            type="button"
-            className="btn-shine hidden md:block text-white bg-gradient-btn text-nowrap h-[48px] md:h-[56px] border-2 border-secondary cursor-pointer rounded-xl font-luckiest-guy text-lg md:text-xl lg:text-2xl hover:bg-accent-yellow transition-colors shadow-lg px-6 md:px-12"
+          <a
+            href="https://memedepot.com/d/rich-whale-alliance"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:block"
           >
-            Discover More
-          </button>
+            <button
+              type="button"
+              className="btn-shine text-white bg-gradient-btn text-nowrap h-[48px] md:h-[56px] border-2 border-secondary cursor-pointer rounded-xl font-luckiest-guy text-lg md:text-xl lg:text-2xl hover:bg-accent-yellow transition-colors shadow-lg px-6 md:px-12"
+            >
+              Discover More
+            </button>
+          </a>
         </div>
       </div>
 
@@ -29,12 +36,19 @@ export default function MemesTooSection() {
       </div>
 
       <div className="md:hidden block w-full px-4">
-        <button
-          type="button"
-          className="btn-shine w-full text-white bg-gradient-btn text-nowrap h-[48px] md:h-[56px] border-2 border-secondary cursor-pointer rounded-xl font-luckiest-guy text-lg md:text-xl lg:text-2xl hover:bg-accent-yellow transition-colors shadow-lg px-6 md:px-12"
+        <a
+          href="https://memedepot.com/d/rich-whale-alliance"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block w-full"
         >
-          Discover More
-        </button>
+          <button
+            type="button"
+            className="btn-shine w-full text-white bg-gradient-btn text-nowrap h-[48px] md:h-[56px] border-2 border-secondary cursor-pointer rounded-xl font-luckiest-guy text-lg md:text-xl lg:text-2xl hover:bg-accent-yellow transition-colors shadow-lg px-6 md:px-12"
+          >
+            Discover More
+          </button>
+        </a>
       </div>
     </div>
   );

@@ -4,12 +4,53 @@ import { useState } from "react";
 
 export default function NewsLetterSection() {
   const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Newsletter subscription:", email);
-    setEmail("");
+    setIsSubmitting(true);
+    setSubmitStatus("idle");
+
+    try {
+      // Create form data for Google Forms
+      const formData = new FormData();
+      formData.append("entry.589989991", email);
+
+      // Submit to Google Forms using fetch
+      const response = await fetch(
+        "https://docs.google.com/forms/d/e/1FAIpQLSfEInQxngYCCNxwWm2t84hl6rE8kfepw8qfFL95uF4E93Zqcw/formResponse",
+        {
+          method: "POST",
+          body: formData,
+          mode: "no-cors", // This prevents CORS issues
+        }
+      );
+
+      // Since we're using no-cors, we can't read the response
+      // But Google Forms will still receive the data
+      setSubmitStatus("success");
+      setEmail("");
+
+      // Reset success message after 3 seconds
+      setTimeout(() => {
+        setSubmitStatus("idle");
+      }, 3000);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      setSubmitStatus("error");
+
+      // Reset error message after 3 seconds
+      setTimeout(() => {
+        setSubmitStatus("idle");
+      }, 3000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
   return (
     <div className="w-full pb-8 md:pb-10 lg:pb-8 relative overflow-hidden mt-8 md:mt-10">
       <div className="px-4 md:px-10 lg:px-20 xl:px-28 relative z-10">
@@ -33,21 +74,40 @@ export default function NewsLetterSection() {
               placeholder="Your Email"
               className="w-full h-full font-raleway outline-none p-2 md:p-4 px-10 md:px-12 lg:px-14 xl:px-16 text-sm md:text-base lg:text-lg xl:text-xl bg-transparent"
               required
+              disabled={isSubmitting}
             />
             <button
               type="submit"
-              className="md:hidden mr-2 bg-[#018EFC] w-fit h-10 px-4 lg:px-16 text-sm text-white flex items-center justify-center rounded-xl md:rounded-2xl font-poppins font-bold font-raleway cursor-pointer transition-colors hover:bg-[#0066CC]"
+              disabled={isSubmitting}
+              className="md:hidden mr-2 bg-[#018EFC] w-fit h-10 px-4 lg:px-16 text-sm text-white flex items-center justify-center rounded-xl md:rounded-2xl font-poppins font-bold font-raleway cursor-pointer transition-colors hover:bg-[#0066CC] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Subscribe
+              {isSubmitting ? "Subscribing..." : "Subscribe"}
             </button>
           </div>
           <button
             type="submit"
-            className="hidden md:flex bg-[#018EFC] w-full md:w-fit h-10 md:h-12 lg:h-14 px-8 md:px-12 lg:px-16 text-sm md:text-base lg:text-lg xl:text-xl text-white items-center justify-center rounded-xl md:rounded-2xl font-poppins font-bold font-raleway cursor-pointer transition-colors hover:bg-[#0066CC]"
+            disabled={isSubmitting}
+            className="hidden md:flex bg-[#018EFC] w-full md:w-fit h-10 md:h-12 lg:h-14 px-8 md:px-12 lg:px-16 text-sm md:text-base lg:text-lg xl:text-xl text-white items-center justify-center rounded-xl md:rounded-2xl font-poppins font-bold font-raleway cursor-pointer transition-colors hover:bg-[#0066CC] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Subscribe
+            {isSubmitting ? "Subscribing..." : "Subscribe"}
           </button>
         </form>
+
+        {/* Status Messages */}
+        {submitStatus === "success" && (
+          <div className="mt-4 text-center md:text-left">
+            <p className="text-green-600 font-medium">
+              🎉 Successfully subscribed! Welcome to the whale family!
+            </p>
+          </div>
+        )}
+        {submitStatus === "error" && (
+          <div className="mt-4 text-center md:text-left">
+            <p className="text-red-600 font-medium">
+              ❌ Something went wrong. Please try again.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Background decoration */}

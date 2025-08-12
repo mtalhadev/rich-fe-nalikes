@@ -1,9 +1,15 @@
-export default function TotalStakedSection() {
+interface TotalStakedSectionProps {
+  onStakeClick: () => void;
+}
+
+export default function TotalStakedSection({
+  onStakeClick,
+}: TotalStakedSectionProps) {
   return (
     <div className="relative w-screen h-full">
       <div className="max-w-6xl mx-auto w-full h-[120px] xs:h-[50px] sm:h-[450px] lg:pt-5 lg:h-fit flex flex-col justify-center relative">
         <div className="absolute -top-[235px] xs:-top-[310px] sm:-top-[20px] md:top-0 md:relative w-full flex flex-col gap-y-6 sm:gap-y-10 lg:gap-y-6 px-4 md:px-10 xl:px-0 py-8 sm:py-20 md:py-14 mx-auto">
-          <div className="w-full flex flex-col lg:flex-row flex-wrap items-center justify-between gap-6 sm:gap-10 md:gap-6">
+          <div className="w-full flex flex-col lg:flex-row flex-wrap items-center justify-between gap-6 sm:gap-y-10 md:gap-6">
             <div className="w-full flex flex-col gap-y-3 sm:gap-y-4 lg:w-fit flex-1 items-center lg:items-start">
               <h1 className="text-navy uppercase text-center lg:text-left text-xl sm:text-2xl md:text-3xl font-black leading-tight">
                 A world where Whales <br className="hidden md:block" /> Play &
@@ -51,12 +57,15 @@ export default function TotalStakedSection() {
 
                 {/* Second Row - Stake Now Button (Full Width) */}
                 <div className="w-full">
-                  <div className="w-full rounded-2xl bg-[#78B9DF] p-4 md:p-8 flex justify-center items-center md:min-h-[120px]">
+                  <button
+                    onClick={onStakeClick}
+                    className="w-full rounded-2xl bg-[#78B9DF] p-4 md:p-8 flex justify-center items-center md:min-h-[120px] hover:bg-[#78B9DF]/90 transition-colors cursor-pointer"
+                  >
                     <h1 className="font-luckiest-guy text-2xl md:text-4xl text-white uppercase leading-none text-center">
                       STAKE
                       <br className="hidden md:block" /> NOW
                     </h1>
-                  </div>
+                  </button>
                 </div>
               </div>
 
@@ -90,12 +99,15 @@ export default function TotalStakedSection() {
                 </div>
 
                 {/* Stake Now Button Card */}
-                <div className="min-w-[200px] w-fit h-full gap-y-6 rounded-3xl bg-[#78B9DF] p-6 flex flex-col justify-between relative flex-shrink-0">
+                <button
+                  onClick={onStakeClick}
+                  className="min-w-[200px] w-fit h-full gap-y-6 rounded-3xl bg-[#78B9DF] p-6 flex flex-col justify-between relative flex-shrink-0 hover:bg-[#78B9DF]/90 transition-colors cursor-pointer"
+                >
                   <h1 className="font-luckiest-guy text-6xl text-white text-wrap uppercase">
                     STAKE <br />
                     NOW
                   </h1>
-                </div>
+                </button>
               </div>
             </div>
           </div>
