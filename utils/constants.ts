@@ -1,0 +1,7 @@
+import abi from "./stakingAbi.json";
+
+const STAKING_CONTRACT_ABI = abi;
+const STAKING_CONTRACT_ADDRESS =
+  process.env.NEXT_PUBLIC_STAKING_CONTRACT_ADDRESS;
+
+export { STAKING_CONTRACT_ABI, STAKING_CONTRACT_ADDRESS };

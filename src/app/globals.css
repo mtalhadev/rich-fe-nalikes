@@ -1,0 +1,302 @@
+@import "tailwindcss";
+@import "@fontsource/spline-sans-mono/700.css";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --font-alfa: "Alfa Slab One", serif;
+  --font-raleway: "Raleway", serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-luckiest-guy: var(--font-luckiest-guy);
+  --font-alfa-slab-one: var(--font-alfa-slab-one);
+  --font-noto-sans: var(--font-noto-sans);
+  --font-nunito-sans: var(--font-nunito-sans);
+  --color-primary-gradient: var(--gradient-primary);
+  --color-secondary: #0036ae;
+  --color-water: #cddcff;
+  --color-navy: #1e355e;
+  --color-dark-gray: #2e6385;
+  --color-accent-yellow: #ffd700;
+  --background-image-gradient-btn: linear-gradient(
+    to right,
+    #00c6ff 0%,
+    #0072ff 100%
+  );
+  --breakpoint-xs: 430px;
+  --color-be-dark: #19182580;
+}
+
+@layer base {
+  @font-face {
+    font-family: "Alfa Slab One";
+    src: url("/fonts/AlfaSlabOne-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Raleway";
+    src: url("/fonts/raleway-font.ttf") format("truetype");
+    font-weight: 400;
+    font-display: swap;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --navy-blue: #1e355e;
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --gradient-primary: linear-gradient(
+      93.42deg,
+      #1ad3e4 -18.87%,
+      #005feb 104.07%
+    );
+  }
+}
+
+body {
+  overflow-x: hidden;
+  font-family: var(--font-noto-sans), sans-serif;
+}
+
+.background-overlay {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60vh;
+  background: url("/bg.png") center center / contain no-repeat;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* === Shared Utility Classes === */
+
+.bg-primary-blue {
+  background-color: #0036ae !important;
+}
+.bg-light-blue {
+  background-color: #78b9df !important;
+}
+.bg-dark-blue {
+  background-color: #1e355e !important;
+}
+.bg-accent-yellow {
+  background-color: #f8e2c6 !important;
+}
+.text-primary-blue {
+  color: #0036ae !important;
+}
+.text-dark-blue {
+  color: #1e355e !important;
+}
+.border-primary-blue {
+  border-color: #0036ae !important;
+}
+.border-dark-blue {
+  border-color: #1e355e !important;
+}
+.text-accent-yellow {
+  color: #f8e2c6 !important;
+}
+.border-accent-yellow {
+  border-color: #f8e2c6 !important;
+}
+.shadow-blue-4 {
+  box-shadow: 4px 4px 0px 0px #0036ae !important;
+}
+.shadow-blue-3 {
+  box-shadow: 3px 3px 0 0 #0036ae !important;
+}
+.shadow-blue-2 {
+  box-shadow: 2px 2px 0 0 #0036ae !important;
+}
+.shadow-blue-custom {
+  box-shadow: -6px 6px 0 0 #0036ae !important;
+}
+.rounded-lg {
+  border-radius: 0.5rem !important;
+}
+.rounded-xl {
+  border-radius: 0.75rem !important;
+}
+.font-luckiest-guy {
+  font-family: var(--font-luckiest-guy), cursive !important;
+}
+.font-poppins {
+  font-family: "Poppins", sans-serif !important;
+}
+.font-spline-sans-mono {
+  font-family: "Spline Sans Mono", monospace !important;
+  font-weight: 700 !important;
+  font-style: bold !important;
+}
+
+/* === Semantic Font Size Utilities === */
+.text-brand-md {
+  font-size: 20px !important;
+}
+.text-brand-lg {
+  font-size: 25px !important;
+}
+
+.text-stroke {
+  -webkit-text-stroke: 1px #1e355e;
+}
+
+.text-stroke-navy {
+  text-shadow: -5px -5px 0 #1e355e, 5px -5px 0 #1e355e, -5px 5px 0 #1e355e,
+    5px 5px 0 #1e355e, -5px 0px 0 #1e355e, 5px 0px 0 #1e355e, 0px -5px 0 #1e355e,
+    0px 5px 0 #1e355e, -4px -4px 0 #1e355e, 4px -4px 0 #1e355e,
+    -4px 4px 0 #1e355e, 4px 4px 0 #1e355e, -4px 0px 0 #1e355e, 4px 0px 0 #1e355e,
+    0px -4px 0 #1e355e, 0px 4px 0 #1e355e, -3px -3px 0 #1e355e,
+    3px -3px 0 #1e355e, -3px 3px 0 #1e355e, 3px 3px 0 #1e355e,
+    -3px 0px 0 #1e355e, 3px 0px 0 #1e355e, 0px -3px 0 #1e355e, 0px 3px 0 #1e355e,
+    -2px -2px 0 #1e355e, 2px -2px 0 #1e355e, -2px 2px 0 #1e355e,
+    2px 2px 0 #1e355e, -2px 0px 0 #1e355e, 2px 0px 0 #1e355e, 0px -2px 0 #1e355e,
+    0px 2px 0 #1e355e, -1px -1px 0 #1e355e, 1px -1px 0 #1e355e,
+    -1px 1px 0 #1e355e, 1px 1px 0 #1e355e, -1px 0px 0 #1e355e, 1px 0px 0 #1e355e,
+    0px -1px 0 #1e355e, 0px 1px 0 #1e355e;
+}
+
+@keyframes slideInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in-up {
+  opacity: 0;
+  transform: translateY(40px);
+  animation: slideInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.6s ease-out forwards;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.slide-in-right {
+  animation: slideInRight 0.6s ease-out forwards;
+}
+
+@keyframes floatLeftRight {
+  0%,
+  100% {
+    transform: translateX(40px);
+  }
+  50% {
+    transform: translateX(60px);
+  }
+}
+
+.float-left-right {
+  animation: floatLeftRight 3s ease-in-out infinite;
+}
+
+@keyframes mbfloatLeftRight {
+  0%,
+  100% {
+    transform: translateX(-20px);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+}
+
+.mb-float-left-right {
+  animation: mbfloatLeftRight 3s ease-in-out infinite;
+}
+
+@keyframes shine {
+  0% {
+    left: -75%;
+  }
+  100% {
+    left: 125%;
+  }
+}
+
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+.btn-shine:hover::after {
+  animation: shine 0.7s forwards;
+}
+
+.Toastify__close-button {
+  display: none !important;
+}
+
+.Toastify__toast,
+.Toastify__toast-body {
+  padding: 0 !important;
+}
+
+.home-banner {
+  background-image: url("/home-banner.png");
+  background-size: conatin;
+  background-position: top;
+  background-repeat: no-repeat;
+}
+
+.wallet-btn-gradient {
+  background: linear-gradient(to right, #00c6ff 0%, #0072ff 100%);
+}
+
+/* Hide scrollbar for webkit browsers */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
