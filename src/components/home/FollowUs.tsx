@@ -129,7 +129,7 @@ export default function FollowUs() {
                 <div className="flex justify-between items-start gap-1 md:gap-2 lg:gap-4 mb-2">
                   <div className="text-[#111827] flex flex-col gap-1">
                     <span className="text-base md:text-lg lg:text-xl font-raleway font-semibold">
-                      150<span className="text-blue-500">k</span>
+                      6,942
                     </span>
                     <span className="text-xs md:text-sm font-semibold font-raleway text-be-dark">
                       Followers
