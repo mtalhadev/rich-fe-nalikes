@@ -1,16 +1,15 @@
 import Footer from "@/components/common/Footer";
-import HeroSection from "@/components/HeroSection";
 import Navbar from "@/components/Navbar";
-import Ticker from "@/components/Ticker";
 import VaultCard from "@/components/VaultCard";
 
 export default function Home() {
   return (
     <div>
+      {/* <StakeTicker /> */}
       {/* <Ticker /> */}
       <Navbar />
       {/* <HeroSection /> */}
-      <main className="max-w-7xl mb-24 mx-auto relative z-10 flex flex-col w-full gap-10 px-6 md:px-20 mt-10">
+      <main className="max-w-7xl mb-24 mx-auto relative z-10 flex flex-col w-full gap-10 px-6 md:px-20 sm:mt-10 ">
         <VaultCard
           vaultName="45 DAYS VAULT"
           totalStaked={0}

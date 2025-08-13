@@ -30,6 +30,60 @@
   --color-be-dark: #19182580;
 }
 
+@layer utilities {
+  .border-gradient {
+    border: 1px solid;
+    border-image-source: linear-gradient(
+      90deg,
+      #ffffff 0%,
+      #0036ae 50.96%,
+      #ffffff 100%
+    );
+    border-image-slice: 1;
+  }
+
+  .border-gradient-blue {
+    border: 1px solid;
+    border-image-source: linear-gradient(
+      90deg,
+      #78b9df 0%,
+      #0036ae 50.96%,
+      #78b9df 100%
+    );
+    border-image-slice: 1;
+  }
+
+  /* Alternative method using background and mask for better browser support */
+  .border-gradient-bg {
+    position: relative;
+    background: linear-gradient(
+      90deg,
+      #ffffff 0%,
+      #0036ae 50.96%,
+      #ffffff 100%
+    );
+    padding: 1px;
+  }
+
+  .border-gradient-blue-bg {
+    position: relative;
+    background: linear-gradient(
+      90deg,
+      #78b9df 0%,
+      #0036ae 50.96%,
+      #78b9df 100%
+    );
+    padding: 1px;
+  }
+
+  .border-gradient-bg > *,
+  .border-gradient-blue-bg > * {
+    background: white;
+    position: relative;
+    z-index: 1;
+  }
+}
+
 @layer base {
   @font-face {
     font-family: "Alfa Slab One";
