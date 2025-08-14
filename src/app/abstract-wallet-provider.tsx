@@ -5,6 +5,7 @@ import { abstract, abstractTestnet } from "viem/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { config } from "../../utils/wagmi";
+import "@rainbow-me/rainbowkit/styles.css";
 import { lightTheme, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 
 const client = new QueryClient();
