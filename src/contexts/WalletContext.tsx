@@ -18,6 +18,7 @@ import {
   STAKING_CONTRACT_ABI,
   STAKING_CONTRACT_ADDRESS,
 } from "../../utils/constants";
+import { fixedNumber } from "../../utils/helpers";
 
 // Function to add chain to MetaMask
 const addChainToMetaMask = async () => {
@@ -57,7 +58,7 @@ const addChainToMetaMask = async () => {
 
 interface UserBalances {
   tokenBalance: string;
-  stakedTokenBalanceContract: string;
+  stakedTokenBalanceContract: number;
   stakedTokenBalance: string;
   rewardTokenBalance: string;
   stakedTokenAllowance: string;
@@ -345,7 +346,10 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         //   stakedTokenDecimals
         // ),
         tokenBalance: tokenBalance.toString(),
-        stakedTokenBalanceContract: stakedTokenBalanceContract.toString(),
+        stakedTokenBalanceContract: fixedNumber(
+          ethers.formatUnits(stakedTokenBalanceContract, stakedTokenDecimals),
+          2
+        ),
         stakedTokenBalance: stakedTokenBalance.toString(),
         // rewardTokenBalance: ethers.formatUnits(
         //   rewardTokenBalance,
