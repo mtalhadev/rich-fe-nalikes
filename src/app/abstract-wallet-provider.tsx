@@ -1,7 +1,7 @@
 "use client";
 
 import { AbstractWalletProvider } from "@abstract-foundation/agw-react";
-import { abstract, abstractTestnet, sepolia } from "viem/chains";
+import { abstract, abstractTestnet } from "viem/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { config } from "../../utils/wagmi";

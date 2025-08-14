@@ -1,5 +1,5 @@
 import { createConfig } from "wagmi";
-import { abstract, abstractTestnet, sepolia } from "wagmi/chains";
+import { abstract, abstractTestnet } from "wagmi/chains";
 import { createClient, http } from "viem";
 import { eip712WalletActions } from "viem/zksync";
 import { connectors } from "./rainbowKit";
