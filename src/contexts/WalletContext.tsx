@@ -345,11 +345,8 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         pendingReward: ethers.formatUnits(pendingReward, stakedTokenDecimals),
         fourtyFiveDaysApy,
         ninetyDaysApy,
-        // tokenBalance: ethers.formatUnits(
-        //   tokenBalance,
-        //   stakedTokenDecimals
-        // ),
-        tokenBalance: tokenBalance.toString(),
+        tokenBalance: ethers.formatUnits(tokenBalance, stakedTokenDecimals),
+        // tokenBalance: tokenBalance.toString(),
         stakedTokenBalanceContract: fixedNumber(
           ethers.formatUnits(stakedTokenBalanceContract, stakedTokenDecimals),
           2
