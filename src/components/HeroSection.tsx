@@ -1,6 +1,7 @@
 "use client";
 
 import { useWallet } from "@/contexts/WalletContext";
+import { NumericFormat } from "react-number-format";
 import { Poppins } from "next/font/google";
 
 const poppins = Poppins({
@@ -17,7 +18,7 @@ export default function HeroSection() {
     <section className="relative w-full sm:pb-8 z-10 mt-6 md:mt-0">
       {/* Top Row: Logo, Badge, Button */}
       <div className="w-full flex flex-col md:flex-row items-center justify-between max-w-7xl mx-auto md:mx-0 mt-5 relative">
-        <div className="flex-1 flex flex-col items-center md:items-start gap-2 md:gap-6 px-2 md:px-0 md:w-[52%] md:flex-none">
+        <div className="flex-1 flex flex-col items-center md:items-start gap-2 md:gap-6 px-2 md:px-0 md:w-[52% w-full md:flex-none">
           <h1
             className={`text-3xl text-center md:text-left md:text-4xl lg:text-6xl text-white drop-shadow-[0.5px_0.5px_0_#1E355E] font-black leading-tight font-noto-sans text-stroke sm:mt-4`}
           >
@@ -29,19 +30,25 @@ export default function HeroSection() {
             Lock your $RWA tokens in the vaults to earn rewards paid out in RWA
           </p>
           {/* Stats Row */}
-          <div className="flex flex-col md:flex-row md:justify-center items-center gap-5 mt-4 w-full">
+          <div className="flex flex-col md:flex-row md:justify-center items-center gap-4 mt-4 w-full">
             {/* Mobile Layout - Vertical Stack */}
             <div className="flex flex-col gap-y-3 md:hidden w-full px-4">
               {/* First Row - Total Staked and Total Rewards */}
-              <div className="flex gap-x-3 w-full ">
+              <div className="flex gap-x-2 w-full">
                 {/* Total Staked Card */}
-                <div className="flex-1 rounded-2xl bg-[#CDDCFF] p-4 flex flex-col justify-between min-h-[100px]">
-                  <h1 className="font-luckiest-guy text-sm text-navy uppercase leading-tight">
+                <div className="flex-1 w-full rounded-2xl bg-[#CDDCFF] p-4 flex flex-col justify-between min-h-[80px]">
+                  <h1 className="font-luckiest-guy text-xs text-navy uppercase leading-tight">
                     Total Staked
                   </h1>
-                  <div className="flex items-end gap-x-1 mt-2">
-                    <span className="text-3xl leading-none font-luckiest-guy text-[#2e6385]">
-                      {totalStaked}
+                  <div className="flex items-end gap-x-2 mt-1">
+                    <span className="text-xl md:text-3xl leading-none font-luckiest-guy text-[#2e6385]">
+                      <NumericFormat
+                        value={totalStaked || 0}
+                        thousandSeparator
+                        displayType="text"
+                        decimalScale={2}
+                        className="word-break max-w-[70%] break-words text-xl md:text-3xl"
+                      />
                     </span>
                     <span className="font-luckiest-guy text-xs text-navy mb-1">
                       RWA
@@ -50,11 +57,11 @@ export default function HeroSection() {
                 </div>
 
                 {/* Total Rewards Card */}
-                <div className="flex-1 rounded-2xl bg-[#286CCB] p-4 flex flex-col justify-between min-h-[100px]">
-                  <h1 className="font-luckiest-guy text-sm text-white uppercase leading-tight">
+                <div className="flex-1 w-full rounded-2xl bg-[#286CCB] p-4 flex flex-col justify-between min-h-[80px]">
+                  <h1 className="font-luckiest-guy text-xs text-white uppercase leading-tight">
                     Total Rewards
                   </h1>
-                  <div className="flex items-end gap-x-1 mt-2">
+                  <div className="flex items-end gap-x-1 mt-1">
                     <span className="text-3xl leading-none font-luckiest-guy text-white">
                       300M+
                     </span>
@@ -64,15 +71,21 @@ export default function HeroSection() {
             </div>
 
             {/* Desktop Layout - Horizontal */}
-            <div className="hidden md:flex flex-wrap items-center gap-6 w-full lg:px-0">
+            <div className="hidden md:flex items-center gap-6 w-full lg:px-0">
               {/* Total Staked Card */}
-              <div className="min-w-[200px] w-fit h-full gap-y-6 rounded-3xl bg-[#CDDCFF] p-6 flex flex-col justify-between relative flex-shrink-0">
+              <div className="min-w-[20px] w-fit h-full gap-y-6 rounded-3xl bg-[#CDDCFF] p-6 flex flex-col justify-between relative flex-shrink-0">
                 <h1 className="font-luckiest-guy text-2xl text-navy uppercase">
                   Total Staked
                 </h1>
                 <div className="flex items-end gap-x-2">
-                  <span className="text-6xl leading-none font-luckiest-guy text-dark-gray">
-                    {totalStaked}
+                  <span className="text-3xl md:text-6xl leading-noneleading-tight font-luckiest-guy text-dark-gray">
+                    <NumericFormat
+                      value={totalStaked || 0}
+                      thousandSeparator
+                      displayType="text"
+                      decimalScale={2}
+                      className="word-break max-w-[70%] break-words text-6xl"
+                    />
                   </span>
                   <span className="font-luckiest-guy text-xl text-navy mb-2">
                     RWA

@@ -9,7 +9,7 @@ export default function Home() {
       {/* <Ticker /> */}
       <Navbar />
       {/* <HeroSection /> */}
-      <main className="max-w-7xl mb-24 mx-auto relative z-10 flex flex-col w-full gap-10 px-6 md:px-20 sm:mt-10 ">
+      <main className="max-w-7xl mb-10 md:mb-24 mx-auto relative z-10 flex flex-col w-full md:gap-10 gap-14 px-6 md:px-20 sm:mt-10 ">
         <VaultCard
           vaultName="45 DAYS VAULT"
           totalStaked={0}

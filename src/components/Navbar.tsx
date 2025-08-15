@@ -9,7 +9,7 @@ import Link from "next/link";
 export default function Navbar() {
   const { isConnected, connectWallet, connectWalletLabel } = useWallet();
   return (
-    <div className="sm:bg-[url('/bg-desktop.svg')] bg-[url('/stake-banner-bg.svg')] bg-no-repeat bg-contain sm:bg-cover sm:bg-[position:center_-70px] flex flex-col md:gap-y-4 lg:gap-y-3 items-center py-4 lg:py-3 w-full h-[35vh] md:h-[80vh] lg:h-[90vh] relative">
+    <div className="mb-8 sm:bg-[url('/bg-desktop.svg')] bg-[url('/stake-banner-bg.svg')] bg-no-repeat bg-cover bg-center min-h-[80vh] flex flex-col md:gap-y-4 lg:gap-y-3 items-center py-4 lg:py-3 w-full relative">
       <div className="max-w-7xl w-full mx-auto px-2 xs:px-4 sm:px-8 md:px-12 lg:px-18 flex flex-col h-fit items-center justify-between">
         <div className="w-full flex items-center justify-between gap-12">
           <div className="md:w-36 md:h-28 lg:w-32 lg:h-24 h-fit w-fit">

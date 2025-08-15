@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function Footer() {
   return (
-    <footer className="w-full relative bg-[url('/footer-bg-mobile.svg')] md:bg-[url('/footerbg.svg')] bg-no-repeat bg-center bg-cover min-h-[300px] md:min-h-[400px] lg:min-h-[380px] mt-4">
+    <footer className="w-full relative bg-[url('/footer-bg-mobile.svg')] md:bg-[url('/footerbg.svg')] bg-no-repeat bg-center bg-cover min-h-[300px] md:min-h-[400px] lg:min-h-[380px]">
       {/* Your footer content */}
       {/* Left bottom glow */}
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-[#1AD3E4]/10 to-transparent rounded-full blur-2xl"></div>
@@ -28,9 +28,9 @@ export default function Footer() {
           </div>
 
           {/* Main content section */}
-          <div className="flex flex-row justify-between mb-8 mt-10 gap-4 md:gap-6">
+          <div className="flex flex-row justify-between mb-8 mt-10 gap-6 md:gap-6">
             {/* Left section - About Us */}
-            <div className="w-[55%] md:w-2/3 xs:pr-4 md:pr-0">
+            <div className="w-[55%] md:w-2/3 xs:pr-6 md:pr-0">
               <h3 className="text-[#0036AE] text-lg md:text-xl font-nunito-sans font-black mb-6">
                 Contact Info
               </h3>
@@ -132,7 +132,7 @@ export default function Footer() {
           {/* Bottom section - Copyright and legal links */}
           <div className="border-[#0036AE] pt-4 border-t-[0.5px]">
             <div className="flex flex-col lg:flex-row justify-between xl:flex-row md:flex-col gap-4">
-              <p className="text-center md:text-left text-[#0036AE] font-nunito-sans pr-8 md:pr-0">
+              <p className="text-center md:text-left text-[#0036AE] text-xs md:text-base font-nunito-sans font-semibold md:pr-0">
                 © 2025 RWA INC, All rights reserved
               </p>
               <div className="hidden md:flex md:items-center flex-col sm:flex-row gap-2 md:gap-6">
