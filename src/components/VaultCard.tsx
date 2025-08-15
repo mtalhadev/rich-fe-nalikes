@@ -12,7 +12,7 @@ import { useWallet } from "@/contexts/WalletContext";
 import { NumericFormat } from "react-number-format";
 import { useWalletOperations } from "@/hooks/useWalletOperations";
 import { showToast } from "@/components/CustomToast";
-import { cn } from "../../utils/helpers";
+import { cn, formatNumber } from "../../utils/helpers";
 
 type ButtonState = "stake" | "unstake" | "claim";
 
@@ -162,6 +162,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
     pendingReward,
     stakedAmount,
   } = balances;
+
   const apy = useMemo(() => {
     const apyValue =
       days === 45
@@ -659,7 +660,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
           </div>
           <div className="rounded-3xl flex gap-1 items-center text-lg text-white justify-center px-4 py-2 sm:bg-[#78B9DF]">
             <p className="font-normal text-center leading-none font-luckiest-guy mt-[1px] sm:mt-0">
-              {apy}%
+              {apy ? formatNumber(Number(apy) * 1000, 2) : 0}%
             </p>
             <p className="text-center font-poppins font-bold">APY</p>
           </div>

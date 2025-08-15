@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function Footer() {
   return (
-    <footer className="w-full relative bg-[url('/footerbg.svg')] bg-no-repeat bg-center bg-cover min-h-[300px] md:min-h-[400px] lg:min-h-[380px] mt-4">
+    <footer className="w-full relative bg-[url('/footer-bg-mobile.svg')] md:bg-[url('/footerbg.svg')] bg-no-repeat bg-center bg-cover min-h-[300px] md:min-h-[400px] lg:min-h-[380px] mt-4">
       {/* Your footer content */}
       {/* Left bottom glow */}
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-[#1AD3E4]/10 to-transparent rounded-full blur-2xl"></div>
@@ -22,15 +22,15 @@ export default function Footer() {
                 width={200}
                 height={84}
                 alt="RWA Logo"
-                className="h-12 w-auto"
+                className="h-12 w-auto -ml-2"
               />
             </div>
           </div>
 
           {/* Main content section */}
-          <div className="flex flex-col xs:flex-row md:justify-between mb-8 mt-14 gap-6 xs:gap-2 md:gap-6">
+          <div className="flex flex-row justify-between mb-8 mt-10 gap-4 md:gap-6">
             {/* Left section - About Us */}
-            <div className="w-full xs:w-[50%] md:w-2/3 xs:pr-8 md:pr-0">
+            <div className="w-[55%] md:w-2/3 xs:pr-4 md:pr-0">
               <h3 className="text-[#0036AE] text-lg md:text-xl font-nunito-sans font-black mb-6">
                 Contact Info
               </h3>
@@ -45,7 +45,7 @@ export default function Footer() {
                   />
                   <a
                     href="https://x.com/RWAlliance___"
-                    className="block text-[#0036AE] text-sm md:text-base font-nunito-sans underline"
+                    className="block text-[#0036AE] text-[11px] md:text-sm font-nunito-sans underline"
                   >
                     https://x.com/RWAlliance___
                   </a>
@@ -61,7 +61,7 @@ export default function Footer() {
                   <a
                     href="https://t.me/RWAlliance"
                     target="_blank"
-                    className="block text-[#0036AE] text-sm md:text-base font-nunito-sans text-wrap w-full break-words xl:break-normal underline"
+                    className="block text-[#0036AE] text-[11px] md:text-base font-nunito-sans text-wrap w-full break-words xl:break-normal underline"
                   >
                     https://t.me/RWAlliance
                   </a>
@@ -77,7 +77,7 @@ export default function Footer() {
                   <a
                     href="https://dexscreener.com/abstract/0x9d735b41918b3fc495c7de540f7213a979050859"
                     target="_blank"
-                    className="block text-[#0036AE] text-sm md:text-base font-nunito-sans text-wrap w-full break-words xl:break-normal underline"
+                    className="block text-[#0036AE] text-[11px] md:text-base font-nunito-sans text-wrap w-full break-words xl:break-normal underline max-w-[145px] md:max-w-full"
                   >
                     0xAf31d07AF1602Dfce07Fba81BcA5F9570CA83983
                   </a>
@@ -86,7 +86,7 @@ export default function Footer() {
             </div>
 
             {/* Middle section - Quick Links */}
-            <div className="md:w-1/3 w-full xs:w-[40%]">
+            <div className="w-[45%] md:w-1/3">
               <h3 className="text-[#0036AE] font-nunito-sans font-black text-lg md:text-xl mb-6">
                 QUICK LINKS
               </h3>
@@ -94,19 +94,19 @@ export default function Footer() {
                 <div className="space-y-3">
                   <a
                     href="#"
-                    className="block text-[#0036AE] text-sm md:text-base font-nunito-sans "
+                    className="block  text-[11px] text-[#0036AE] md:text-base font-nunito-sans "
                   >
                     Home
                   </a>
                   <a
                     href="#wallpaper"
-                    className="block text-[#0036AE] text-sm md:text-base font-nunito-sans  "
+                    className="block text-[#0036AE] text-[11px] md:text-base font-nunito-sans  "
                   >
                     Wallpapers
                   </a>
                   <a
                     href="#stickers"
-                    className="block text-[#0036AE] text-sm md:text-base font-nunito-sans  "
+                    className="block text-[#0036AE] text-[11px] md:text-base font-nunito-sans  "
                   >
                     Stickers
                   </a>
@@ -114,13 +114,13 @@ export default function Footer() {
                 <div className="space-y-3 flex md:hidden md:items-center flex-col">
                   <a
                     href="#"
-                    className="text-[#0036AE] text-sm md:text-base font-nunito-sans text-nowrap transition-colors underline"
+                    className="text-[#0036AE] text-[11px] md:text-base font-nunito-sans text-nowrap transition-colors underline"
                   >
                     Term & Condition
                   </a>
                   <a
                     href="#"
-                    className="text-[#0036AE] text-sm md:text-base font-nunito-sans transition-colors underline"
+                    className="text-[#0036AE] text-[11px] md:text-base font-nunito-sans transition-colors underline"
                   >
                     Privacy Policy
                   </a>
@@ -133,7 +133,7 @@ export default function Footer() {
           <div className="border-[#0036AE] pt-4 border-t-[0.5px]">
             <div className="flex flex-col lg:flex-row justify-between xl:flex-row md:flex-col gap-4">
               <p className="text-center md:text-left text-[#0036AE] font-nunito-sans pr-8 md:pr-0">
-                © 2025 Meme Coin, All Rights Reserved
+                © 2025 RWA INC, All rights reserved
               </p>
               <div className="hidden md:flex md:items-center flex-col sm:flex-row gap-2 md:gap-6">
                 <a

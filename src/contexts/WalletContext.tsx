@@ -302,7 +302,11 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
       let ninetyDaysApy = "0";
 
       try {
-        const rewardPerBlock = await stakingContract.rewardPerBlock();
+        let rewardPerBlock = await stakingContract.rewardPerBlock();
+        rewardPerBlock = ethers.formatUnits(
+          rewardPerBlock,
+          rewardTokenDecimals
+        );
 
         // Calculate rewards per year (assuming 12 second block time)
         const blocksPerFourtyFiveDays =
@@ -312,22 +316,22 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
           (90 * 24 * 60 * 60) /
           Number(process.env.NEXT_PUBLIC_BLOCK_EXECUTION_TIME);
         const rewardsPerFourtyFiveDays =
-          rewardPerBlock * BigInt(blocksPerFourtyFiveDays);
+          Number(rewardPerBlock) * Number(blocksPerFourtyFiveDays);
         const rewardsPerNinetyFiveDays =
-          rewardPerBlock * BigInt(blocksPerNinetyDays);
+          Number(rewardPerBlock) * Number(blocksPerNinetyDays);
 
         // This would require getting total staked from the contract
         // For now, we'll use a placeholder
-        const totalStaked = ethers.parseUnits(
-          stakedTokenBalanceContract.toString(),
+        const totalStaked = ethers.formatUnits(
+          stakedTokenBalanceContract,
           stakedTokenDecimals
         );
 
-        if (totalStaked > BigInt(0)) {
+        if (Number(totalStaked) > 0) {
           const apyFourtyFiveDays =
-            rewardsPerFourtyFiveDays / (totalStaked * BigInt(10));
+            Number(rewardsPerFourtyFiveDays) / Number(totalStaked);
           const apyNinetyDays =
-            rewardsPerNinetyFiveDays / (totalStaked * BigInt(10));
+            Number(rewardsPerNinetyFiveDays) / Number(totalStaked);
           fourtyFiveDaysApy = apyFourtyFiveDays.toString();
           ninetyDaysApy = apyNinetyDays.toString();
         }
