@@ -13,6 +13,7 @@ import { NumericFormat } from "react-number-format";
 import { useWalletOperations } from "@/hooks/useWalletOperations";
 import { showToast } from "@/components/CustomToast";
 import { cn, fixedNumber } from "../../utils/helpers";
+import StakeBgObject from "@/icons/stake-bg-object";
 
 type ButtonState = "stake" | "unstake" | "claim";
 
@@ -653,12 +654,27 @@ const VaultCard: React.FC<VaultCardProps> = ({
 
   return (
     <div
-      className={`relative bg-[#CDDCFF] bg-[url('/stake-box-bg.svg')] bg-no-repeat bg-contain bg-top-left rounded-2xl md:rounded-[44px] p-3 md:p-6 w-full sm:h-auto mx-auto md:mx-0`}
+      className={`relative bg-[#CDDCFF] sm:bg-[url('/stake-box-bg.svg')] bg-no-repeat bg-contain bg-top-left rounded-3xl md:rounded-[44px] p-3 md:p-6 w-full sm:h-auto mx-auto md:mx-0`}
     >
+      {/* background objects */}
+
+      <StakeBgObject className="absolute -top-[19px] left-0 w-[87%] h-[133px]" />
+      {/* blurry rectangle */}
+      <div
+        className="sm:hidden block absolute inset-x-0
+   xs:w-auto xs:max-w-[323px] left-[46px] bottom-3
+         h-[45px]
+        bg-linear-[93.42deg,#1AD3E4_-18.87%,#005FEB_104.07%]
+        opacity-50
+        border-[2px] border-[#0036AE]
+        blur-[13px]
+        rounded-[12px]"
+      />
+
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-2 md:mb-4 md:gap-8 gap-4 w-full">
         <div className="flex items-center gap-4 w-full justify-between sm:justify-start">
-          <div className="rounded-md px-2 md:px-4 py-1 text-primary-blue text-sm md:text-lg sm:text-xl md:text-3xl font-alfa">
+          <div className="rounded-md px-2 md:px-4 py-1 text-primary-blue text-sm  sm:text-xl md:text-3xl font-alfa">
             {`${days} DAYS VAULT`}
           </div>
           <div className="rounded-3xl flex gap-1 items-center text-sm md:text-lg text-white justify-center px-4 py-2 sm:bg-[#78B9DF]">
