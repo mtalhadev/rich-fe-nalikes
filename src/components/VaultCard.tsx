@@ -12,7 +12,7 @@ import { useWallet } from "@/contexts/WalletContext";
 import { NumericFormat } from "react-number-format";
 import { useWalletOperations } from "@/hooks/useWalletOperations";
 import { showToast } from "@/components/CustomToast";
-import { cn, formatNumber } from "../../utils/helpers";
+import { cn, fixedNumber } from "../../utils/helpers";
 
 type ButtonState = "stake" | "unstake" | "claim";
 
@@ -313,7 +313,9 @@ const VaultCard: React.FC<VaultCardProps> = ({
     <div className="bg-white max-w-full rounded-2xl md:rounded-3xl px-4 md:px-6 py-3 sm:py-5 text-white font-semibold mb-4 ">
       <div className="flex sm:flex-row flex-col justify-between sm:items-center text-navy">
         <div className="flex flex-col md:gap-[18px] gap-2 sm:gap-6">
-          <span className="font-poppins font-semibold text-[10px] sm:text-xs md:text-base">Total Staked</span>
+          <span className="font-poppins font-semibold text-[10px] sm:text-xs md:text-base">
+            Total Staked
+          </span>
           <span className="font-normal font-luckiest-guy text-xl md:text-5xl word-break max-w-[200px] sm:max-w-[300px] break-words leading-tight">
             <NumericFormat
               value={totalStaked || 0}
@@ -337,21 +339,21 @@ const VaultCard: React.FC<VaultCardProps> = ({
           <span className="renderStatsSection font-poppins text-[10px] sm:text-xs font-semibold">
             Your Staked
           </span>
-                      <span className="font-normal font-alfa text-xl md:text-5xl max-w-[200px] sm:max-w-[300px] break-words leading-tight">
-              <NumericFormat
-                value={userStakedBalance}
-                thousandSeparator
-                displayType="text"
-                decimalScale={2}
-              />
-              /
-              <NumericFormat
-                value={stakedAmount}
-                thousandSeparator
-                displayType="text"
-                decimalScale={2}
-              />
-            </span>
+          <span className="font-normal font-alfa text-xl md:text-5xl max-w-[200px] sm:max-w-[300px] break-words leading-tight">
+            <NumericFormat
+              value={userStakedBalance}
+              thousandSeparator
+              displayType="text"
+              decimalScale={2}
+            />
+            /
+            <NumericFormat
+              value={stakedAmount}
+              thousandSeparator
+              displayType="text"
+              decimalScale={2}
+            />
+          </span>
         </div>
       </div>
     </div>
@@ -362,7 +364,9 @@ const VaultCard: React.FC<VaultCardProps> = ({
       <div className="bg-[#78B9DF] w-full rounded-2xl md:rounded-3xl px-4 md:px-6 py-3 text-white font-semibold mb-4">
         <div className="flex sm:flex-row flex-col justify-between sm:items-center text-navy">
           <div className="flex flex-col sm:gap-4">
-            <span className="font-poppins font-semibold text-xs md:text-base">You Will Stake</span>
+            <span className="font-poppins font-semibold text-xs md:text-base">
+              You Will Stake
+            </span>
             <span className="font-normal font-luckiest-guy text-xl md:text-5xl">
               <input
                 type="number"
@@ -396,12 +400,13 @@ const VaultCard: React.FC<VaultCardProps> = ({
           <div className="flex flex-col sm:gap-6 gap-2">
             <span className="renderStatsSection text-xs md:text-base">RWA</span>
             <span className="font-normal font-alfa text-xl md:text-5xl max-w-[200px] sm:max-w-[300px] break-words leading-tight">
-              <NumericFormat
+              {/* <NumericFormat
                 value={userBalance}
                 thousandSeparator
                 displayType="text"
-                decimalScale={3}
-              />
+                decimalScale={2}
+              /> */}
+              {fixedNumber(Number(userBalance), 2)}
               <span className="text-xs md:text-base">RWA</span>
             </span>
           </div>

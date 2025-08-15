@@ -23,7 +23,7 @@ export default function HeroSection() {
             className={`text-3xl text-center md:text-left md:text-4xl lg:text-6xl text-white drop-shadow-[0.5px_0.5px_0_#1E355E] font-black leading-tight font-noto-sans text-stroke sm:mt-4`}
           >
             STAKE RWA & EARN REWARDS
-          </h1> 
+          </h1>
           <p
             className={`text-sm text-center md:text-left md:text-base lg:text-xl text-dark-blue font-semibold sm:mt-0 mt-5`}
           >
