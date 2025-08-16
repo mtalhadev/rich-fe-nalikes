@@ -342,8 +342,9 @@ const VaultCard: React.FC<VaultCardProps> = ({
               displayType="text"
               decimalScale={2}
             /> */}
-            {fixedNumber(userStakedBalance, 2)}/
-            {fixedNumber(Number(userStakedBalance), 2)}
+            {fixedNumber(userStakedBalance, 2)}
+            {/* /
+            {fixedNumber(Number(userStakedBalance), 2)} */}
             {/* <NumericFormat
               value={stakedAmount}
               thousandSeparator
