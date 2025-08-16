@@ -357,9 +357,9 @@ const VaultCard: React.FC<VaultCardProps> = ({
 
   const renderInputSection = () => (
     <>
-      <div className="bg-[#78B9DF] w-full rounded-2xl md:rounded-3xl px-4 md:px-6 py-3 text-white font-semibold mb-4">
+      <div className="bg-[#78B9DF] w-full rounded-2xl md:rounded-3xl px-4 md:px-6 py-4.5 text-white font-semibold mb-4">
         <div className="flex sm:flex-row flex-col justify-between sm:items-center text-navy">
-          <div className="flex flex-col sm:gap-4">
+          <div className="flex flex-col sm:gap-4 md:w-[45.5%]">
             <span className="font-poppins font-semibold text-xs md:text-base">
               You Will Stake
             </span>
@@ -379,7 +379,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
                 min="0"
                 max={maxStakeAmount}
                 disabled={maxStakeAmount === 0}
-                className="h-fit p-0 text-xl md:text-5xl m-0 leading-0 font-normal bg-transparent border-none outline-none w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 transition-all duration-200 ease-in-out focus:scale-[1.02]"
+                className="h-fit p-0 text-xl md:text-5xl m-0 leading-0 font-normal bg-transparent border-none outline-none w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 transition-all duration-200 ease-in-out focus:scale-[1.02] w-full"
               />
             </span>
           </div>
@@ -393,77 +393,25 @@ const VaultCard: React.FC<VaultCardProps> = ({
           />
           {/* border for small screen below */}
           <span className="border-gradient-blue-bg h-[1px] w-full my-2 block sm:hidden" />
-          <div className="flex flex-col sm:gap-6 gap-2">
-            <span className="renderStatsSection text-xs md:text-base">RWA</span>
-            <span className="font-normal font-alfa text-xl md:text-5xl max-w-[200px] sm:max-w-[300px] break-words leading-tight">
-              {/* <NumericFormat
+          <div className="flex flex-col sm:gap-6 gap-2 md:w-[45.5%] items-end">
+            <div className="flex flex-col sm:gap-4">
+              <span className="renderStatsSection text-xs md:text-base">
+                RWA
+              </span>
+              <span className="font-normal font-alfa text-xl md:text-5xl max-w-[200px] sm:max-w-[300px] break-words leading-tight">
+                {/* <NumericFormat
                 value={userBalance}
                 thousandSeparator
                 displayType="text"
                 decimalScale={2}
               /> */}
-              {fixedNumber(Number(userBalance), 2)}
-              <span className="text-xs md:text-base">RWA</span>
-            </span>
+                {fixedNumber(Number(userBalance), 2)}
+                <span className="text-xs md:text-base">RWA</span>
+              </span>
+            </div>
           </div>
         </div>
       </div>
-      {/* <div className="bg-[#B8CEFF] rounded-lg flex flex-col px-3 py-2 mb-4 border border-[#0036AE] shadow-[3px_3px_0_0_#0036AE]">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1">
-            <input
-              type="number"
-              value={stakeAmount}
-              onChange={(e) => {
-                const value = parseFloat(e.target.value) || 0;
-                const clampedValue = Math.min(
-                  Math.max(value, 0),
-                  maxStakeAmount
-                );
-                setStakeAmount(clampedValue.toString());
-              }}
-              placeholder="0.0"
-              min="0"
-              max={maxStakeAmount}
-              disabled={maxStakeAmount === 0}
-              className="font-luckiest-guy font-normal text-primary-blue text-base md:text-lg bg-transparent border-none outline-none w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 transition-all duration-200 ease-in-out focus:scale-[1.02]"
-            />
-          </div>
-          <div className="flex items-center">
-            <span className="mx-2 text-white font-normal font-luckiest-guy text-lg">
-              {tokenSymbol}
-            </span>
-            <Image src="/logo.svg" alt="logo" width={25} height={25} />
-          </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <p className="font-poppins font-normal text-[8px] text-white">
-            You Will Stake
-          </p>
-          <div className="flex items-center gap-1 mt-0.5">
-            <Image src="/wallet.svg" alt="wallet" width={12} height={12} />
-
-            <p className="font-poppins font-normal text-[8px] text-primary-blue">
-              <NumericFormat
-                value={userBalance}
-                thousandSeparator
-                displayType="text"
-                decimalScale={3}
-              />{" "}
-            </p>
-            <span className="font-poppins font-medium text-primary-blue text-[8px]">
-              {tokenSymbol}
-            </span>
-            <button
-              className="bg-[#759CF3] text-dark-blue py-0.5 px-1.5 rounded-[2px] font-medium text-[6px] font-poppins hover:bg-[#5A8BE8] transition-all duration-200 ease-in-out transform hover:scale-110 hover:shadow-sm disabled:opacity-50 disabled:hover:scale-100"
-              onClick={() => setStakeAmount(userBalance)}
-              disabled={maxStakeAmount === 0}
-            >
-              MAX
-            </button>
-          </div>
-        </div>
-      </div> */}
     </>
   );
 
