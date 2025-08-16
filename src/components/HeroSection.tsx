@@ -58,7 +58,7 @@ export default function HeroSection() {
                   </h1>
                   <div className="flex items-end gap-x-1 mt-1">
                     <span className="text-3xl leading-none font-luckiest-guy text-white">
-                      300M+
+                      100M+
                     </span>
                   </div>
                 </div>
@@ -108,7 +108,7 @@ export default function HeroSection() {
                 </h1>
                 <div className="flex items-end gap-x-2">
                   <span className="text-6xl leading-none font-luckiest-guy text-white">
-                    300M+
+                    100M+
                   </span>
                 </div>
               </div>

@@ -11,7 +11,7 @@ export default function Home() {
       {/* <HeroSection /> */}
       <main className="max-w-7xl mb-10 md:mb-24 mx-auto relative z-10 flex flex-col w-full md:gap-10 gap-14 px-6 md:px-20 sm:mt-10 ">
         <VaultCard
-          vaultName="45 DAYS VAULT"
+          vaultName="RWA Vault 1"
           yourStaked={0}
           yourStakedMax={0}
           days={45}
@@ -21,7 +21,7 @@ export default function Home() {
           tokenSymbol="RWA"
           index={0}
         />
-        <VaultCard
+        {/* <VaultCard
           vaultName="90 DAYS VAULT"
           yourStaked={500}
           yourStakedMax={1000}
@@ -31,7 +31,7 @@ export default function Home() {
           claimedRewards={678.9}
           tokenSymbol="RWA"
           index={1}
-        />
+        /> */}
       </main>
 
       <Footer />

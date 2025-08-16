@@ -115,6 +115,7 @@ const CONTENT_CONFIG = {
 
 const VaultCard: React.FC<VaultCardProps> = ({
   days = 45,
+  vaultName,
   yourStaked = 0,
   yourStakedMax = 0,
   earliestUnlock = "75:09:09",
@@ -404,7 +405,8 @@ const VaultCard: React.FC<VaultCardProps> = ({
                 displayType="text"
                 decimalScale={2}
               /> */}
-                {fixedNumber(Number(userBalance), 2)}
+                {/* {fixedNumber(Number(userBalance), 2)} */}
+                {formatLargeNumber(userBalance)}
                 <span className="text-xs md:text-base">RWA</span>
               </span>
             </div>
@@ -617,17 +619,19 @@ const VaultCard: React.FC<VaultCardProps> = ({
       <div className="flex flex-col md:flex-row justify-between items-center mb-2 md:mb-4 md:gap-8 gap-4 w-full">
         <div className="flex items-center gap-4 w-full justify-between sm:justify-start">
           <div className="rounded-md px-2 md:px-4 py-1 text-primary-blue text-sm  sm:text-xl md:text-3xl font-alfa">
-            {`${days} DAYS VAULT`}
+            {/* {`${days} DAYS VAULT`} */}
+            {vaultName}
           </div>
           <div className="rounded-3xl flex gap-1 items-center text-sm md:text-lg text-white justify-center px-4 py-2 sm:bg-[#78B9DF]">
             <p className="font-normal text-center leading-none font-luckiest-guy mt-[1px] sm:mt-0">
-              <NumericFormat
+              {/* <NumericFormat
                 value={apy ? Number(apy) * 1000 : 0}
                 thousandSeparator
                 displayType="text"
                 decimalScale={2}
                 suffix="%"
-              />
+              /> */}
+              400%
             </p>
             <p className="text-center font-poppins font-bold">APY</p>
           </div>
