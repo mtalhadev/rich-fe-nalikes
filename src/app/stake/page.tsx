@@ -18,7 +18,6 @@ export default function Home() {
             yourStakedMax={0}
             days={45}
             earliestUnlock="75:09:09"
-            pendingRewards={6544.82}
             claimedRewards={6544.82}
             tokenSymbol="RWA"
             index={0}

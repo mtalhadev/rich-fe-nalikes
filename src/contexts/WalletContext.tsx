@@ -69,6 +69,7 @@ interface UserBalances {
   pendingReward: string;
   fourtyFiveDaysApy: string;
   ninetyDaysApy: string;
+  perBlockExecutionTime?: number;
 }
 
 interface WalletContextType {
@@ -96,6 +97,7 @@ interface WalletContextType {
   userBalances: UserBalances | null;
   fetchUserBalances: () => Promise<void>;
   fetchTotalStaked: () => Promise<void>;
+  updateBlockExecutionTime: () => Promise<void>;
   isLoadingBalances: boolean;
 
   // Success Modal
@@ -128,6 +130,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     pendingReward: "0",
     fourtyFiveDaysApy: "0",
     ninetyDaysApy: "0",
+    perBlockExecutionTime: 12,
   });
   const [isLoadingBalances, setIsLoadingBalances] = useState(false);
   const [isStakingSuccessModalOpen, setIsStakingSuccessModalOpen] =
@@ -286,7 +289,45 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     }
   };
 
-  console.log("userBalances", userBalances);
+  // Calculate and update block execution time
+  const updateBlockExecutionTime = async () => {
+    try {
+      // Use public RPC endpoint for Abstract
+      const publicProvider = new ethers.JsonRpcProvider(
+        process.env.NEXT_PUBLIC_RPC_URL
+      );
+
+      // Get latest block number
+      const latestBlock = await publicProvider.getBlockNumber();
+
+      // Get latest block details
+      const latest = await publicProvider.getBlock(latestBlock);
+
+      // Get earlier block details (20 blocks back)
+      const first = await publicProvider.getBlock(latestBlock - 20);
+
+      if (latest && first) {
+        // Calculate average block time
+        const avgBlockTime = (latest.timestamp - first.timestamp) / 20;
+
+        // Update userBalances with the calculated block time
+        setUserBalances((prevBalances) => {
+          if (prevBalances) {
+            return {
+              ...prevBalances,
+              perBlockExecutionTime: avgBlockTime,
+            };
+          }
+          return prevBalances;
+        });
+
+        console.log("Block execution time updated:", avgBlockTime);
+      }
+    } catch (err: any) {
+      console.error("Error calculating block execution time:", err);
+      // Keep the default value on error
+    }
+  };
 
   // Fetch user balances
   const fetchUserBalances = async () => {
@@ -396,13 +437,10 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
           rewardTokenDecimals
         );
 
-        // Calculate rewards per year (assuming 12 second block time)
-        const blocksPerFourtyFiveDays =
-          (45 * 24 * 60 * 60) /
-          Number(process.env.NEXT_PUBLIC_BLOCK_EXECUTION_TIME);
-        const blocksPerNinetyDays =
-          (90 * 24 * 60 * 60) /
-          Number(process.env.NEXT_PUBLIC_BLOCK_EXECUTION_TIME);
+        // Calculate rewards per year using dynamic block execution time
+        const currentBlockTime = userBalances?.perBlockExecutionTime || 12;
+        const blocksPerFourtyFiveDays = (45 * 24 * 60 * 60) / currentBlockTime;
+        const blocksPerNinetyDays = (90 * 24 * 60 * 60) / currentBlockTime;
         const rewardsPerFourtyFiveDays =
           Number(rewardPerBlock) * Number(blocksPerFourtyFiveDays);
         const rewardsPerNinetyFiveDays =
@@ -456,7 +494,15 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         nativeBalance: ethers.formatUnits(nativeBalance),
       };
 
-      setUserBalances(balances);
+      setUserBalances((prevBalances) => {
+        if (prevBalances) {
+          return {
+            ...prevBalances,
+            ...balances,
+          };
+        }
+        return prevBalances;
+      });
       console.log("User balances updated:", balances);
     } catch (error) {
       console.error("Error fetching user balances:", error);
@@ -488,6 +534,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   // Fetch total staked amount when component mounts (no wallet connection required)
   useEffect(() => {
     fetchTotalStaked();
+    updateBlockExecutionTime();
   }, []);
 
   const value: WalletContextType = {
@@ -515,6 +562,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     userBalances,
     fetchUserBalances,
     fetchTotalStaked,
+    updateBlockExecutionTime,
     isLoadingBalances,
 
     // Success Modal

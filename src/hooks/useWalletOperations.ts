@@ -46,7 +46,7 @@ const addChainToMetaMask = async () => {
 };
 
 export const useWalletOperations = () => {
-  const { showStakingSuccessModal } = useWallet();
+  const { showStakingSuccessModal, userBalances } = useWallet();
 
   // Helper function to get user-friendly error messages
   const getErrorMessage = (error: any, action: string): string => {
@@ -625,8 +625,9 @@ export const useWalletOperations = () => {
 
       const remainingBlocks = bonusEndBlockNum - currentBlockNum;
 
-      const timeRemainingSeconds =
-        remainingBlocks * Number(process.env.NEXT_PUBLIC_BLOCK_EXECUTION_TIME);
+      const timeRemainingSeconds = Math.round(
+        remainingBlocks * (userBalances?.perBlockExecutionTime || 12)
+      );
 
       const canUnstake = timeRemainingSeconds <= 0;
 

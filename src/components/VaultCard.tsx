@@ -24,7 +24,6 @@ type VaultCardProps = {
   yourStakedMax?: number | string;
   days?: number;
   earliestUnlock?: string;
-  pendingRewards?: number | string;
   claimedRewards?: number | string;
   tokenSymbol?: string;
   index?: number;
@@ -120,7 +119,6 @@ const VaultCard: React.FC<VaultCardProps> = ({
   yourStaked = 0,
   yourStakedMax = 0,
   earliestUnlock = "75:09:09",
-  pendingRewards = 6544.82,
   claimedRewards = 6544.82,
   tokenSymbol = "RWA",
   index = 0,
@@ -240,7 +238,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
     };
 
     updateTimer();
-  }, [isConnected]); // Only depend on isConnected, not the functions
+  }, [isConnected, userBalances?.perBlockExecutionTime]); // Only depend on isConnected, not the functions
 
   // Countdown timer effect - optimized to prevent unnecessary re-renders
   useEffect(() => {
@@ -304,7 +302,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
       earliestUnlock,
       claimedRewards,
       stakedAmount,
-      pendingReward,
+      pendingReward: Number(pendingReward) + Number(userStakedBalance),
       userBalance,
       unstakeTime: earliestUnlock,
     };
