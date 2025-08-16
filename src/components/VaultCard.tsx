@@ -12,7 +12,7 @@ import { useWallet } from "@/contexts/WalletContext";
 import { NumericFormat } from "react-number-format";
 import { useWalletOperations } from "@/hooks/useWalletOperations";
 import { showToast } from "@/components/CustomToast";
-import { cn, fixedNumber } from "../../utils/helpers";
+import { cn, fixedNumber, formatLargeNumber } from "../../utils/helpers";
 import StakeBgObject from "@/icons/stake-bg-object";
 
 type ButtonState = "stake" | "unstake" | "claim";
@@ -318,12 +318,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
             Total Staked
           </span>
           <span className="font-normal font-luckiest-guy text-xl md:text-5xl word-break max-w-[200px] sm:max-w-[300px] break-words leading-tight">
-            <NumericFormat
-              value={totalStaked || 0}
-              thousandSeparator
-              displayType="text"
-              decimalScale={2}
-            />
+            {formatLargeNumber(totalStaked) || 0}
           </span>
         </div>
         {/* <div className="w-px h-5 my-auto bg-white mx-2" /> */}
@@ -658,7 +653,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
     >
       {/* background objects */}
 
-      <StakeBgObject className="absolute -top-[19px] left-0 w-[87%] h-[133px]" />
+      <StakeBgObject className="block md:hidden absolute -top-[19px] left-0 w-[87%] h-[133px]" />
       {/* blurry rectangle */}
       <div
         className="sm:hidden block absolute inset-x-0
@@ -772,7 +767,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
           alt="stake-box-bg"
           width={1000}
           height={1000}
-          className="absolute md:block -bottom-36 sm:-bottom-52 md:-bottom-28 -right-3 md:-right-10 w-12 scale-x-[-1] md:scale-x-100 md:w-24 h-full"
+          className="absolute md:block -bottom-36 sm:-bottom-52 md:-bottom-28 -right-3 md:-right-10 w-12 scale-x-100 md:scale-x-[-1] md:w-24 h-full"
         />
       )}
       {days === 90 && (

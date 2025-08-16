@@ -30,12 +30,6 @@ export default function Navbar() {
                 {"Buy RWA"}
               </button>
             </Link> */}
-            {/* <button
-              onClick={connectWallet}
-              className="bg-gradient-to-r btn-shine from-[#1AD3E4] text-xs sm:text-sm text-nowrap md:text-xl lg:text-lg to-[#005FEB] border-2 border-secondary cursor-pointer text-white px-2.5 sm:px-4 md:px-6 py-1 xs:py-2 lg:py-1.5 rounded-lg xs:rounded-xl lg:rounded-lg font-luckiest-guy hover:opacity-90 transition-opacity"
-            >
-              {connectWalletLabel}
-            </button> */}
 
             <button
               type="button"
@@ -47,7 +41,12 @@ export default function Navbar() {
             >
               Buy RWA
             </button>
-
+            <button
+              onClick={connectWallet}
+              className="hidden md:block bg-gradient-to-r btn-shine from-[#1AD3E4] text-xs sm:text-sm text-nowrap md:text-xl lg:text-lg to-[#005FEB] border-2 border-secondary cursor-pointer text-white px-2.5 sm:px-4 md:px-6 py-1 xs:py-2 lg:py-1.5 rounded-lg xs:rounded-xl lg:rounded-lg font-luckiest-guy hover:opacity-90 transition-opacity"
+            >
+              {connectWalletLabel}
+            </button>
             <button
               type="button"
               className="w-[39px] h-[39px] flex items-center justify-center 

@@ -3,6 +3,7 @@
 import { useWallet } from "@/contexts/WalletContext";
 import { NumericFormat } from "react-number-format";
 import { Poppins } from "next/font/google";
+import { formatLargeNumber } from "../../utils/helpers";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -42,15 +43,9 @@ export default function HeroSection() {
                   </h1>
                   <div className="flex items-end gap-x-2 mt-1">
                     <span className="text-xl md:text-3xl leading-none font-luckiest-guy text-[#2e6385]">
-                      <NumericFormat
-                        value={totalStaked || 0}
-                        thousandSeparator
-                        displayType="text"
-                        decimalScale={2}
-                        className="word-break max-w-[70%] break-words text-xl md:text-3xl"
-                      />
+                      {formatLargeNumber(totalStaked) || 0}
                     </span>
-                    <span className="font-luckiest-guy text-xs text-navy mb-1">
+                    <span className="font-luckiest-guy text-xs text-navy mb-0 md:mb-1">
                       RWA
                     </span>
                   </div>
