@@ -59,7 +59,7 @@ const addChainToMetaMask = async () => {
 interface UserBalances {
   tokenBalance: string;
   stakedTokenBalanceContract: number;
-  stakedTokenBalance: number;
+  stakedTokenBalance: string;
   stakedTokenSupply: number;
   rewardTokenBalance: string;
   stakedTokenAllowance: string;
@@ -354,10 +354,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
           ethers.formatUnits(stakedTokenBalanceContract, stakedTokenDecimals),
           2
         ),
-        stakedTokenBalance: fixedNumber(
-          ethers.formatUnits(stakedTokenBalance, stakedTokenDecimals),
-          2
-        ),
+        stakedTokenBalance: stakedTokenBalance.toString(),
         stakedTokenSupply: fixedNumber(
           ethers.formatUnits(stakedTokenSupply, stakedTokenDecimals),
           2
