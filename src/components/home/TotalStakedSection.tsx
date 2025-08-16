@@ -23,11 +23,8 @@ export default function TotalStakedSection({
 
             {/* Stats Cards */}
             <div className="w-full lg:w-fit">
-              {/* Mobile Layout - Vertical Stack */}
               <div className="flex flex-col gap-y-3 md:hidden w-full px-4">
-                {/* First Row - Total Staked and Total Rewards */}
                 <div className="flex gap-x-3 w-full">
-                  {/* Total Staked Card */}
                   <div className="flex-1 rounded-2xl bg-[#CDDCFF] p-4 flex flex-col justify-between min-h-[100px]">
                     <h1 className="font-luckiest-guy text-sm text-navy uppercase leading-tight">
                       Total Staked
@@ -71,7 +68,6 @@ export default function TotalStakedSection({
 
               {/* Desktop Layout - Horizontal */}
               <div className="hidden md:flex justify-center items-center gap-x-6 w-full lg:px-0">
-                {/* Total Staked Card */}
                 <div className="min-w-[200px] w-fit h-full gap-y-6 rounded-3xl bg-[#CDDCFF] p-6 flex flex-col justify-between relative flex-shrink-0">
                   <h1 className="font-luckiest-guy text-2xl text-navy uppercase">
                     Total Staked

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import MobileSidebar from "../MobileSidebar";
+import StakingSuccessModal from "../StakingSuccessModal";
 
 interface HeroSectionProps {
   isStakingPopupOpen: boolean;
@@ -127,6 +128,9 @@ export default function HeroSection({
           </div>
         </div>
       )}
+
+      {/* Staking Success Modal */}
+      <StakingSuccessModal />
     </div>
   );
 }

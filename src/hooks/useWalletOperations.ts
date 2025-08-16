@@ -46,6 +46,8 @@ const addChainToMetaMask = async () => {
 };
 
 export const useWalletOperations = () => {
+  const { showStakingSuccessModal } = useWallet();
+
   // Helper function to get user-friendly error messages
   const getErrorMessage = (error: any, action: string): string => {
     let errorMessage = `Failed to ${action}. Please try again.`;
@@ -284,6 +286,7 @@ export const useWalletOperations = () => {
         const receipt = await depositTx.wait();
         console.log("Deposit successful! Block:", receipt.blockNumber);
         showToast("success", "Deposit successful!");
+        showStakingSuccessModal();
 
         // Refresh user balances after successful deposit
         try {

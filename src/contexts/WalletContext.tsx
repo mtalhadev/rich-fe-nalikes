@@ -95,7 +95,13 @@ interface WalletContextType {
   // Balances
   userBalances: UserBalances | null;
   fetchUserBalances: () => Promise<void>;
+  fetchTotalStaked: () => Promise<void>;
   isLoadingBalances: boolean;
+
+  // Success Modal
+  isStakingSuccessModalOpen: boolean;
+  setIsStakingSuccessModalOpen: (isOpen: boolean) => void;
+  showStakingSuccessModal: () => void;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -109,8 +115,23 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const [connectWalletLabel, setConnectWalletLabel] =
     useState("CONNECT WALLET");
   const [isMounted, setIsMounted] = useState(false);
-  const [userBalances, setUserBalances] = useState<UserBalances | null>(null);
+  const [userBalances, setUserBalances] = useState<UserBalances | null>({
+    tokenBalance: "0",
+    stakedTokenBalanceContract: 0,
+    stakedTokenBalance: "0",
+    stakedTokenSupply: 0,
+    rewardTokenBalance: "0",
+    stakedTokenAllowance: "0",
+    nativeBalance: "0",
+    stakedTokenAddress: "",
+    rewardTokenAddress: "",
+    pendingReward: "0",
+    fourtyFiveDaysApy: "0",
+    ninetyDaysApy: "0",
+  });
   const [isLoadingBalances, setIsLoadingBalances] = useState(false);
+  const [isStakingSuccessModalOpen, setIsStakingSuccessModalOpen] =
+    useState(false);
 
   // Wagmi hooks
   const { isConnected, address, chain } = useAccount();
@@ -204,6 +225,69 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     // since Abstract is integrated through RainbowKit
   };
 
+  // Show staking success modal
+  const showStakingSuccessModal = () => {
+    setIsStakingSuccessModalOpen(true);
+  };
+
+  // Fetch total staked amount using public RPC (no wallet connection required)
+  const fetchTotalStaked = async () => {
+    if (!STAKING_CONTRACT_ADDRESS) {
+      console.log("Staking contract address is not set");
+      return;
+    }
+
+    try {
+      // Use public RPC endpoint for Abstract
+      const publicProvider = new ethers.JsonRpcProvider(
+        process.env.NEXT_PUBLIC_RPC_URL
+      );
+
+      const stakingContract = new ethers.Contract(
+        STAKING_CONTRACT_ADDRESS,
+        STAKING_CONTRACT_ABI,
+        publicProvider
+      );
+
+      // Get total staked amount
+      const stakedTokenSupply = await stakingContract.stakedTokenSupply();
+
+      // Get token decimals for proper formatting
+      const stakedTokenAddress = await stakingContract.stakedToken();
+      const tokenContract = new ethers.Contract(
+        stakedTokenAddress,
+        ["function decimals() view returns (uint8)"],
+        publicProvider
+      );
+
+      const decimals = await tokenContract.decimals();
+
+      // Format the total staked amount
+      const formattedTotalStaked = ethers.formatUnits(
+        stakedTokenSupply,
+        decimals
+      );
+
+      // Update userBalances with the total staked amount
+      setUserBalances((prevBalances) => {
+        if (prevBalances) {
+          return {
+            ...prevBalances,
+            stakedTokenSupply: parseFloat(formattedTotalStaked),
+          };
+        }
+        return prevBalances;
+      });
+
+      console.log("Total staked amount updated:", formattedTotalStaked);
+    } catch (err: any) {
+      console.error("Error fetching total staked:", err);
+      // Don't update state on error, keep existing values
+    }
+  };
+
+  console.log("userBalances", userBalances);
+
   // Fetch user balances
   const fetchUserBalances = async () => {
     if (!isConnected || !address || !STAKING_CONTRACT_ADDRESS) {
@@ -279,9 +363,10 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
       );
 
       const userInfo = await stakingContract.userInfo(signer.address);
-      const stakedTokenSupply = await stakingContract.stakedTokenSupply();
 
+      const stakedTokenSupply = await stakingContract.stakedTokenSupply();
       const pendingReward = await stakingContract.pendingReward(signer.address);
+
       const stakedTokenBalance = userInfo.amount;
 
       const stakedTokenBalanceContract = await stakedTokenContract.balanceOf(
@@ -345,7 +430,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
       const balances: UserBalances = {
         stakedTokenAddress,
         rewardTokenAddress,
-        pendingReward: ethers.formatUnits(pendingReward, stakedTokenDecimals),
+        pendingReward: pendingReward.toString(),
         fourtyFiveDaysApy,
         ninetyDaysApy,
         tokenBalance: ethers.formatUnits(tokenBalance, stakedTokenDecimals),
@@ -394,10 +479,16 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   useEffect(() => {
     if (isConnected && address) {
       fetchUserBalances();
-    } else {
-      setUserBalances(null);
     }
+    //  else {
+    //   setUserBalances(null);
+    // }
   }, [isConnected, address]);
+
+  // Fetch total staked amount when component mounts (no wallet connection required)
+  useEffect(() => {
+    fetchTotalStaked();
+  }, []);
 
   const value: WalletContextType = {
     // Connection state
@@ -423,7 +514,13 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     // Balances
     userBalances,
     fetchUserBalances,
+    fetchTotalStaked,
     isLoadingBalances,
+
+    // Success Modal
+    isStakingSuccessModalOpen,
+    setIsStakingSuccessModalOpen,
+    showStakingSuccessModal,
   };
 
   return (

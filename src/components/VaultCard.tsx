@@ -15,7 +15,8 @@ import { showToast } from "@/components/CustomToast";
 import { cn, fixedNumber, formatLargeNumber } from "../../utils/helpers";
 import StakeBgObject from "@/icons/stake-bg-object";
 
-type ButtonState = "stake" | "unstake" | "claim";
+type ButtonState = "stake" | "unstake";
+// | "claim";
 
 type VaultCardProps = {
   vaultName?: string;
@@ -43,12 +44,12 @@ const BUTTON_CONFIG = {
     inactiveIcon: "/unstake-icon.svg",
     action: "UNSTAKE",
   },
-  claim: {
-    label: "CLAIM",
-    activeIcon: "/claim-icon-white.svg",
-    inactiveIcon: "/claim-icon.svg",
-    action: "CLAIM",
-  },
+  // claim: {
+  //   label: "CLAIM",
+  //   activeIcon: "/claim-icon-white.svg",
+  //   inactiveIcon: "/claim-icon.svg",
+  //   action: "CLAIM",
+  // },
 } as const;
 
 // Data structure for content configuration
@@ -76,12 +77,12 @@ const CONTENT_CONFIG = {
   unstake: {
     sections: [
       {
-        type: "unstack",
+        type: "unstake",
         data: {
           items: [
             {
-              label: "Unstack Unlock in",
-              value: "unstackTime",
+              label: "Unstake Unlock in",
+              value: "unstakeTime",
               showIcon: true,
               icon: "/icon.svg",
             },
@@ -305,7 +306,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
       stakedAmount,
       pendingReward,
       userBalance,
-      unstackTime: earliestUnlock,
+      unstakeTime: earliestUnlock,
     };
     return valueMap[key as keyof typeof valueMap] || 0;
   };
@@ -332,7 +333,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
         {/* border for small screen below */}
         <span className="border-gradient h-[1px] w-full my-2 sm:my-2 block sm:hidden " />
         <div className="flex flex-col sm:gap-6 gap-2">
-          <span className="renderStatsSection font-poppins text-[10px] sm:text-xs font-semibold">
+          <span className="renderStatsSection font-poppins text-[10px] sm:text-xs md:text-base font-semibold">
             Your Staked
           </span>
           <span className="font-normal font-alfa text-xl md:text-5xl max-w-[200px] sm:max-w-[300px] break-words leading-tight">
@@ -397,7 +398,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
           <span className="border-gradient-blue-bg h-[1px] w-full my-2 block sm:hidden" />
           <div className="flex flex-col sm:gap-6 gap-2 md:w-[45.5%] items-end">
             <div className="flex flex-col sm:gap-4">
-              <span className="renderStatsSection text-xs md:text-base">
+              <span className="renderStatsSection font-poppins text-xs md:text-base">
                 RWA
               </span>
               <span className="font-normal font-alfa text-xl md:text-5xl max-w-[200px] sm:max-w-[300px] break-words leading-tight">
@@ -455,40 +456,44 @@ const VaultCard: React.FC<VaultCardProps> = ({
     </div>
   );
 
-  const renderUnstackSection = (data: any) => (
+  const renderUnstakeSection = (data: any) => (
     <div className="bg-dark-blue rounded-lg flex flex-col p-4 mb-4 border border-primary-blue shadow-blue-3 transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-[1.01]">
       {data.items?.map((item: any, idx: number) => (
         <div
           key={idx}
           className="flex items-center justify-between border-b border-[#759CF3] py-2"
         >
-          <p className="text-accent-yellow text-xs md:text-[16px] font-luckiest-guy font-normal">
+          <p className="text-accent-yellow text-xs md:text-[16px] font-semibold font-poppins">
             {item.label}
           </p>
-          {/* show timer if item.value is unstackedTime */}
-          {item.value === "unstackTime" ? (
+          {/* show timer if item.value is unstakedTime */}
+          {item.value === "unstakeTime" ? (
             <div className="flex items-center gap-1 text-xs md:text-base">
               <div className="text-white rounded text-center min-w-[10px] md:min-w-[40px]">
-                <span className="font-luckiest-guy text-lg">
+                <span className="font-poppins text-lg font-semibold">
                   {unstakeTimer.split(":")[0]}
                 </span>
               </div>
-              <span className="text-white text-xl font-luckiest-guy">:</span>
+              <span className="text-white text-xl font-poppins font-semibold">
+                :
+              </span>
               <div className="text-white rounded text-center min-w-[40px]">
-                <span className="font-luckiest-guy text-lg">
+                <span className="font-poppins text-lg font-semibold">
                   {unstakeTimer.split(":")[1]}
                 </span>
               </div>
-              <span className="text-white text-xl font-luckiest-guy">:</span>
+              <span className="text-white text-xl font-poppins font-semibold">
+                :
+              </span>
               <div className="text-white rounded text-center min-w-[40px]">
-                <span className="font-luckiest-guy text-lg">
+                <span className="font-poppins text-lg font-semibold">
                   {unstakeTimer.split(":")[2]}
                 </span>
               </div>
             </div>
           ) : (
             <div className="flex items-end flex-col">
-              <p className="text-white md:text-xl font-luckiest-guy font-normal text-end sm:text-start max-w-[150px] break-words leading-tight">
+              <p className="text-white md:text-xl font-poppins font-semibold text-end sm:text-start max-w-[150px] break-words leading-tight">
                 <NumericFormat
                   value={getValueFromKey(item.value)}
                   thousandSeparator
@@ -523,16 +528,16 @@ const VaultCard: React.FC<VaultCardProps> = ({
                     {renderInputSection()}
                   </div>
                 );
-              case "info":
+              // case "info":
+              //   return (
+              //     <div key={idx} className="w-full">
+              //       {renderInfoSection(section.data)}
+              //     </div>
+              //   );
+              case "unstake":
                 return (
                   <div key={idx} className="w-full">
-                    {renderInfoSection(section.data)}
-                  </div>
-                );
-              case "unstack":
-                return (
-                  <div key={idx} className="w-full">
-                    {renderUnstackSection(section.data)}
+                    {renderUnstakeSection(section.data)}
                   </div>
                 );
               default:
@@ -575,14 +580,14 @@ const VaultCard: React.FC<VaultCardProps> = ({
                     }
                     handleUnstake();
                     break;
-                  case "claim":
-                    const claimValidationError = validateClaim();
-                    if (claimValidationError) {
-                      console.error(claimValidationError);
-                      return;
-                    }
-                    handleClaim();
-                    break;
+                  // case "claim":
+                  //   const claimValidationError = validateClaim();
+                  //   if (claimValidationError) {
+                  //     console.error(claimValidationError);
+                  //     return;
+                  //   }
+                  //   handleClaim();
+                  //   break;
                 }
               }
             }}

@@ -32,11 +32,8 @@ export default function HeroSection() {
           </p>
           {/* Stats Row */}
           <div className="flex flex-col md:flex-row md:justify-center items-center gap-4 mt-4 w-full">
-            {/* Mobile Layout - Vertical Stack */}
             <div className="flex flex-col gap-y-3 md:hidden w-full px-4">
-              {/* First Row - Total Staked and Total Rewards */}
               <div className="flex gap-x-2 w-full">
-                {/* Total Staked Card */}
                 <div className="flex-1 w-full rounded-2xl bg-[#CDDCFF] p-4 flex flex-col justify-between min-h-[80px]">
                   <h1 className="font-luckiest-guy text-xs text-navy uppercase leading-tight">
                     Total Staked
@@ -79,7 +76,6 @@ export default function HeroSection() {
 
             {/* Desktop Layout - Horizontal */}
             <div className="hidden md:flex items-center gap-6 w-full lg:px-0">
-              {/* Total Staked Card */}
               <div className="min-w-[20px] w-fit h-full gap-y-6 rounded-3xl bg-[#CDDCFF] p-6 flex flex-col justify-between relative flex-shrink-0">
                 <h1 className="font-luckiest-guy text-2xl text-navy uppercase">
                   Total Staked
