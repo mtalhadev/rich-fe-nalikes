@@ -46,6 +46,57 @@ const addChainToMetaMask = async () => {
 };
 
 export const useWalletOperations = () => {
+  // Helper function to get user-friendly error messages
+  const getErrorMessage = (error: any, action: string): string => {
+    let errorMessage = `Failed to ${action}. Please try again.`;
+
+    if (error && typeof error === "object") {
+      const errorObj = error as any;
+
+      // Check if user rejected the transaction
+      if (errorObj.code === "ACTION_REJECTED" || errorObj.code === 4001) {
+        errorMessage = "Transaction was cancelled by user.";
+      }
+      // Check for MetaMask specific error
+      else if (errorObj.info?.error?.message) {
+        if (
+          errorObj.info.error.message.includes(
+            "User denied transaction signature"
+          )
+        ) {
+          errorMessage = "Transaction was cancelled by user.";
+        } else {
+          errorMessage = `Transaction failed: ${errorObj.info.error.message}`;
+        }
+      }
+      // Check for other common error patterns
+      else if (errorObj.message) {
+        if (
+          errorObj.message.includes("user rejected") ||
+          errorObj.message.includes("rejected")
+        ) {
+          errorMessage = "Transaction was cancelled by user.";
+        } else if (errorObj.message.includes("insufficient funds")) {
+          errorMessage = "Insufficient funds for transaction.";
+        } else if (errorObj.message.includes("gas")) {
+          errorMessage = "Gas estimation failed. Please try again.";
+        } else {
+          errorMessage = `Transaction failed: ${errorObj.message}`;
+        }
+      }
+      // Check for reason field
+      else if (errorObj.reason) {
+        if (errorObj.reason === "rejected") {
+          errorMessage = "Transaction was cancelled by user.";
+        } else {
+          errorMessage = `Transaction failed: ${errorObj.reason}`;
+        }
+      }
+    }
+
+    return errorMessage;
+  };
+
   const {
     isConnected,
     isConnecting,
@@ -251,16 +302,15 @@ export const useWalletOperations = () => {
           console.log("Transaction error data:", error.data);
         }
 
-        if (error.reason) {
-          showToast("error", "Transaction failed: " + error.reason);
-        } else {
-          showToast("error", "Transaction failed: " + error.message);
-        }
+        console.log("Transaction error:", error);
+
+        showToast("error", getErrorMessage(error, "deposit"));
         return;
       }
     } catch (error) {
       console.error("Error depositing:", error);
-      showToast("error", "Error depositing: " + (error as any).message);
+
+      showToast("error", getErrorMessage(error, "deposit"));
     }
   };
 
@@ -372,7 +422,7 @@ export const useWalletOperations = () => {
       }
     } catch (error) {
       console.error("Error withdrawing:", error);
-      showToast("error", "Error withdrawing: " + (error as any).message);
+      showToast("error", getErrorMessage(error, "withdraw"));
     }
   };
 
@@ -461,7 +511,7 @@ export const useWalletOperations = () => {
       }
     } catch (error) {
       console.error("Error claiming rewards:", error);
-      showToast("error", "Error claiming rewards: " + (error as any).message);
+      showToast("error", getErrorMessage(error, "claim rewards"));
     }
   };
 
@@ -546,7 +596,7 @@ export const useWalletOperations = () => {
       }
     } catch (error) {
       console.error("Error emergency withdrawing:", error);
-      showToast("error", "Error emergency withdrawing tokens");
+      showToast("error", getErrorMessage(error, "emergency withdraw"));
     }
   };
 
