@@ -10,7 +10,7 @@ const poppins = Poppins({
 });
 
 export default function HeroSection() {
-  const { userBalances } = useWallet();
+  const { userBalances, connectWallet, connectWalletLabel } = useWallet();
 
   const totalStaked = userBalances?.stakedTokenBalanceContract || "0";
 
@@ -70,6 +70,7 @@ export default function HeroSection() {
               </div>
 
               <button
+                onClick={connectWallet}
                 type="button"
                 className="bg-gradient-to-r btn-shine from-[#1AD3E4] to-[#005FEB] 
              border-2 border-secondary cursor-pointer text-white 
@@ -77,7 +78,7 @@ export default function HeroSection() {
              text-nowrap rounded-lg font-luckiest-guy 
              hover:opacity-90 transition-opacity sm:hidden block"
               >
-                Connect Wallet
+                {connectWalletLabel}
               </button>
             </div>
 
