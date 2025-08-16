@@ -19,7 +19,6 @@ type ButtonState = "stake" | "unstake" | "claim";
 
 type VaultCardProps = {
   vaultName?: string;
-  totalStaked?: number | string;
   yourStaked?: number | string;
   yourStakedMax?: number | string;
   days?: number;
@@ -147,7 +146,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
   // Get user's balances and data - memoized to prevent unnecessary re-renders
   const balances = useMemo(
     () => ({
-      totalStaked: userBalances?.stakedTokenBalanceContract || "0",
+      stakedTokenSupply: userBalances?.stakedTokenSupply || "0",
       userBalance: userBalances?.tokenBalance || "0",
       userStakedBalance: userBalances?.stakedTokenBalance || "0",
       pendingReward: userBalances?.pendingReward || "0",
@@ -157,7 +156,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
   );
 
   const {
-    totalStaked,
+    stakedTokenSupply,
     userBalance,
     userStakedBalance,
     pendingReward,
@@ -297,7 +296,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
 
   const getValueFromKey = (key: string) => {
     const valueMap = {
-      totalStaked,
+      stakedTokenSupply,
       yourStaked,
       yourStakedMax,
       earliestUnlock,
@@ -318,7 +317,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
             Total Staked
           </span>
           <span className="font-normal font-luckiest-guy text-xl md:text-5xl word-break max-w-[200px] sm:max-w-[300px] break-words leading-tight">
-            {formatLargeNumber(totalStaked) || 0}
+            {formatLargeNumber(stakedTokenSupply) || 0}
           </span>
         </div>
         {/* <div className="w-px h-5 my-auto bg-white mx-2" /> */}

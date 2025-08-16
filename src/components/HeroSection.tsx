@@ -13,7 +13,7 @@ const poppins = Poppins({
 export default function HeroSection() {
   const { userBalances, connectWallet, connectWalletLabel } = useWallet();
 
-  const totalStaked = userBalances?.stakedTokenBalanceContract || "0";
+  const totalStaked = userBalances?.stakedTokenSupply || "0";
 
   return (
     <section className="relative w-full sm:pb-8 z-10 mt-6 md:mt-0">
@@ -86,13 +86,14 @@ export default function HeroSection() {
                 </h1>
                 <div className="flex items-end gap-x-2">
                   <span className="text-3xl md:text-6xl leading-noneleading-tight font-luckiest-guy text-dark-gray">
-                    <NumericFormat
+                    {/* <NumericFormat
                       value={totalStaked || 0}
                       thousandSeparator
                       displayType="text"
                       decimalScale={2}
                       className="word-break max-w-[70%] break-words text-6xl"
-                    />
+                    /> */}
+                    {formatLargeNumber(totalStaked) || 0}
                   </span>
                   <span className="font-luckiest-guy text-xl text-navy mb-2">
                     RWA

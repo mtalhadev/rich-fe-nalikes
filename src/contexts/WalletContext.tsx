@@ -60,6 +60,7 @@ interface UserBalances {
   tokenBalance: string;
   stakedTokenBalanceContract: number;
   stakedTokenBalance: number;
+  stakedTokenSupply: number;
   rewardTokenBalance: string;
   stakedTokenAllowance: string;
   nativeBalance: string;
@@ -278,6 +279,8 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
       );
 
       const userInfo = await stakingContract.userInfo(signer.address);
+      const stakedTokenSupply = await stakingContract.stakedTokenSupply();
+
       const pendingReward = await stakingContract.pendingReward(signer.address);
       const stakedTokenBalance = userInfo.amount;
 
@@ -353,6 +356,10 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         ),
         stakedTokenBalance: fixedNumber(
           ethers.formatUnits(stakedTokenBalance, stakedTokenDecimals),
+          2
+        ),
+        stakedTokenSupply: fixedNumber(
+          ethers.formatUnits(stakedTokenSupply, stakedTokenDecimals),
           2
         ),
         // rewardTokenBalance: ethers.formatUnits(
