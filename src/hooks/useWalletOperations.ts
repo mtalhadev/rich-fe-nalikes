@@ -638,15 +638,28 @@ export const useWalletOperations = () => {
     }
   };
 
-  // Function to format seconds to HH:MM:SS
+  // Function to format seconds to DD:HH:MM or HH:MM:SS based on remaining time
   const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
+    const days = Math.floor(seconds / 86400); // 86400 = 24 * 60 * 60
 
-    return `${hours.toString().padStart(2, "0")}:${minutes
-      .toString()
-      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    if (days >= 1) {
+      // 24 hours or more: show DD:HH:MM
+      const hours = Math.floor((seconds % 86400) / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+
+      return `${days.toString().padStart(2, "0")}:${hours
+        .toString()
+        .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+    } else {
+      // Less than 24 hours: show HH:MM:SS
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+
+      return `${hours.toString().padStart(2, "0")}:${minutes
+        .toString()
+        .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    }
   };
 
   return {

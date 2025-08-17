@@ -591,7 +591,10 @@ const VaultCard: React.FC<VaultCardProps> = ({
             }}
             disabled={activeButton === "unstake" && !canUnstake}
             className={cn(
-              "w-max md:w-fit bg-gradient-to-r btn-shine from-[#1AD3E4] text-nowrap md:text-xl lg:text-lg to-[#005FEB] border-2 border-secondary cursor-pointer text-white px-2.5 sm:px-4 md:px-6 py-2 lg:py-1.5 rounded-xl xs:rounded-2xl lg:rounded-lg font-luckiest-guy hover:opacity-90 transition-opacity"
+              "w-max md:w-fit border-2 bg-gradient-to-r from-[#1AD3E4] to-[#005FEB] border-secondary px-2.5 sm:px-4 md:px-6 py-2 lg:py-1.5 rounded-xl xs:rounded-2xl lg:rounded-lg font-luckiest-guy transition-opacity text-white text-nowrap md:text-xl lg:text-lg",
+              activeButton === "unstake" && !canUnstake
+                ? "cursor-not-allowed opacity-50"
+                : " btn-shine  cursor-pointer hover:opacity-90"
             )}
           >
             {buttonLabel}
