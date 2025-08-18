@@ -464,29 +464,60 @@ const VaultCard: React.FC<VaultCardProps> = ({
           <p className="text-accent-yellow text-xs md:text-[16px] font-semibold font-poppins">
             {item.label}
           </p>
-          {/* show timer if item.value is unstakedTime */}
+          {/* show timer if item.value is unstakeTime */}
           {item.value === "unstakeTime" ? (
             <div className="flex items-center gap-1 text-xs md:text-base">
-              <div className="text-white rounded text-center min-w-[10px] md:min-w-[40px]">
-                <span className="font-poppins text-lg font-semibold">
-                  {unstakeTimer.split(":")[0]}
+              {/* First time unit with label */}
+              <div className="flex flex-col items-center">
+                <span className="text-white font-poppins text-lg font-semibold opacity-80 mb-1">
+                  {unstakeTimer.split(":").length === 3 &&
+                  unstakeTimer.split(":")[0] !== "00"
+                    ? "DD"
+                    : "HH"}
                 </span>
+                <div className="text-white rounded text-center min-w-[10px] md:min-w-[40px]">
+                  <span className="font-poppins text-lg font-semibold">
+                    {unstakeTimer.split(":")[0]}
+                  </span>
+                </div>
               </div>
-              <span className="text-white text-xl font-poppins font-semibold">
+
+              <span className="text-white text-xl font-poppins font-semibold mt-6">
                 :
               </span>
-              <div className="text-white rounded text-center min-w-[40px]">
-                <span className="font-poppins text-lg font-semibold">
-                  {unstakeTimer.split(":")[1]}
+
+              {/* Second time unit with label */}
+              <div className="flex flex-col items-center">
+                <span className="text-white font-poppins text-lg font-semibold opacity-80 mb-1">
+                  {unstakeTimer.split(":").length === 3 &&
+                  unstakeTimer.split(":")[0] !== "00"
+                    ? "HH"
+                    : "MM"}
                 </span>
+                <div className="text-white rounded text-center min-w-[40px]">
+                  <span className="font-poppins text-lg font-semibold">
+                    {unstakeTimer.split(":")[1]}
+                  </span>
+                </div>
               </div>
-              <span className="text-white text-xl font-poppins font-semibold">
+
+              <span className="text-white text-xl font-poppins font-semibold mt-6">
                 :
               </span>
-              <div className="text-white rounded text-center min-w-[40px]">
-                <span className="font-poppins text-lg font-semibold">
-                  {unstakeTimer.split(":")[2]}
+
+              {/* Third time unit with label */}
+              <div className="flex flex-col items-center">
+                <span className="text-white font-poppins text-lg font-semibold opacity-80 mb-1">
+                  {unstakeTimer.split(":").length === 3 &&
+                  unstakeTimer.split(":")[0] !== "00"
+                    ? "MM"
+                    : "SS"}
                 </span>
+                <div className="text-white rounded text-center min-w-[40px]">
+                  <span className="font-poppins text-lg font-semibold">
+                    {unstakeTimer.split(":")[2]}
+                  </span>
+                </div>
               </div>
             </div>
           ) : (
