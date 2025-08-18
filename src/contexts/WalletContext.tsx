@@ -7,7 +7,12 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-import { useAccount, useDisconnect, useSwitchChain } from "wagmi";
+import {
+  useAccount,
+  useDisconnect,
+  useReadContract,
+  useSwitchChain,
+} from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useLoginWithAbstract } from "@abstract-foundation/agw-react";
 import { ethers } from "ethers";
@@ -57,7 +62,7 @@ const addChainToMetaMask = async () => {
 };
 
 interface UserBalances {
-  tokenBalance: string;
+  tokenBalance: number;
   stakedTokenBalanceContract: number;
   stakedTokenBalance: number;
   stakedTokenSupply: number;
@@ -118,7 +123,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     useState("CONNECT WALLET");
   const [isMounted, setIsMounted] = useState(false);
   const [userBalances, setUserBalances] = useState<UserBalances | null>({
-    tokenBalance: "0",
+    tokenBalance: 0,
     stakedTokenBalanceContract: 0,
     stakedTokenBalance: 0,
     stakedTokenSupply: 0,
@@ -329,7 +334,130 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     }
   };
 
-  // Fetch user balances
+  // Read contract hooks for staking contract
+  const { data: stakedTokenAddress } = useReadContract({
+    address: STAKING_CONTRACT_ADDRESS as `0x${string}`,
+    abi: STAKING_CONTRACT_ABI,
+    functionName: "stakedToken",
+    query: {
+      enabled: !!STAKING_CONTRACT_ADDRESS,
+    },
+  });
+
+  const { data: rewardTokenAddress } = useReadContract({
+    address: STAKING_CONTRACT_ADDRESS as `0x${string}`,
+    abi: STAKING_CONTRACT_ABI,
+    functionName: "rewardToken",
+    query: {
+      enabled: !!STAKING_CONTRACT_ADDRESS,
+    },
+  });
+
+  const { data: stakedTokenSupply } = useReadContract({
+    address: STAKING_CONTRACT_ADDRESS as `0x${string}`,
+    abi: STAKING_CONTRACT_ABI,
+    functionName: "stakedTokenSupply",
+    query: {
+      enabled: !!STAKING_CONTRACT_ADDRESS,
+    },
+  });
+
+  const { data: rewardPerBlock } = useReadContract({
+    address: STAKING_CONTRACT_ADDRESS as `0x${string}`,
+    abi: STAKING_CONTRACT_ABI,
+    functionName: "rewardPerBlock",
+    query: {
+      enabled: !!STAKING_CONTRACT_ADDRESS,
+    },
+  });
+
+  // Read contract hooks for user-specific data
+  const { data: userInfo } = useReadContract({
+    address: STAKING_CONTRACT_ADDRESS as `0x${string}`,
+    abi: STAKING_CONTRACT_ABI,
+    functionName: "userInfo",
+    args: address ? [address] : undefined,
+    query: {
+      enabled: !!STAKING_CONTRACT_ADDRESS && !!address,
+    },
+  });
+
+  const { data: pendingReward } = useReadContract({
+    address: STAKING_CONTRACT_ADDRESS as `0x${string}`,
+    abi: STAKING_CONTRACT_ABI,
+    functionName: "pendingReward",
+    args: address ? [address] : undefined,
+    query: {
+      enabled: !!STAKING_CONTRACT_ADDRESS && !!address,
+    },
+  });
+
+  // Read contract hooks for token contracts (only when addresses are available)
+  const { data: tokenBalance } = useReadContract({
+    address: stakedTokenAddress as `0x${string}`,
+    abi: erc20Abi,
+    functionName: "balanceOf",
+    args: address ? [address] : undefined,
+    query: {
+      enabled: !!stakedTokenAddress && !!address,
+    },
+  });
+
+  const { data: rewardTokenBalance } = useReadContract({
+    address: rewardTokenAddress as `0x${string}`,
+    abi: erc20Abi,
+    functionName: "balanceOf",
+    args: address ? [address] : undefined,
+    query: {
+      enabled: !!rewardTokenAddress && !!address,
+    },
+  });
+
+  const { data: stakedTokenAllowance } = useReadContract({
+    address: stakedTokenAddress as `0x${string}`,
+    abi: erc20Abi,
+    functionName: "allowance",
+    args:
+      address && STAKING_CONTRACT_ADDRESS
+        ? [address, STAKING_CONTRACT_ADDRESS as `0x${string}`]
+        : undefined,
+    query: {
+      enabled: !!stakedTokenAddress && !!address && !!STAKING_CONTRACT_ADDRESS,
+    },
+  });
+
+  const { data: stakedTokenBalanceContract } = useReadContract({
+    address: stakedTokenAddress as `0x${string}`,
+    abi: erc20Abi,
+    functionName: "balanceOf",
+    args: STAKING_CONTRACT_ADDRESS
+      ? [STAKING_CONTRACT_ADDRESS as `0x${string}`]
+      : undefined,
+    query: {
+      enabled: !!stakedTokenAddress && !!STAKING_CONTRACT_ADDRESS,
+    },
+  });
+
+  // Read contract hooks for token decimals
+  const { data: stakedTokenDecimals } = useReadContract({
+    address: stakedTokenAddress as `0x${string}`,
+    abi: erc20Abi,
+    functionName: "decimals",
+    query: {
+      enabled: !!stakedTokenAddress,
+    },
+  });
+
+  const { data: rewardTokenDecimals } = useReadContract({
+    address: rewardTokenAddress as `0x${string}`,
+    abi: erc20Abi,
+    functionName: "decimals",
+    query: {
+      enabled: !!rewardTokenAddress,
+    },
+  });
+
+  // Fetch user balances - now using the read contract hooks
   const fetchUserBalances = async () => {
     if (!isConnected || !address || !STAKING_CONTRACT_ADDRESS) {
       console.log(
@@ -337,187 +465,193 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
       );
       return;
     }
+    console.log("fetching user balances");
+    console.log("stakedTokenAddress", stakedTokenAddress);
+    console.log("rewardTokenAddress", rewardTokenAddress);
+    console.log("stakedTokenDecimals", stakedTokenDecimals);
+    console.log("rewardTokenDecimals", rewardTokenDecimals);
+    console.log("userInfo", userInfo);
+    console.log("pendingReward", pendingReward);
+    console.log("tokenBalance", tokenBalance);
+    console.log("rewardTokenBalance", rewardTokenBalance);
+    console.log("stakedTokenAllowance", stakedTokenAllowance);
+    console.log("stakedTokenBalanceContract", stakedTokenBalanceContract);
+    console.log("stakedTokenSupply", stakedTokenSupply);
+    console.log("rewardPerBlock", rewardPerBlock);
 
-    setIsLoadingBalances(true);
-    try {
-      const provider = new ethers.BrowserProvider(window.ethereum as any);
-      const signer = await provider.getSigner();
-
-      console.log("Contract address:", STAKING_CONTRACT_ADDRESS);
-      console.log("User address:", signer.address);
-
-      const stakingContract = new ethers.Contract(
-        STAKING_CONTRACT_ADDRESS,
-        STAKING_CONTRACT_ABI,
-        signer
-      );
-
-      // Check if contract exists and has code
-      const code = await provider.getCode(STAKING_CONTRACT_ADDRESS);
-      if (code === "0x") {
-        console.error(
-          "No contract found at address:",
-          STAKING_CONTRACT_ADDRESS
-        );
-        setUserBalances(null);
-        return;
-      }
-
-      console.log("Contract code found, attempting to call stakedToken()...");
-
-      let stakedTokenAddress: string;
-      let rewardTokenAddress: string;
-
+    // The balances are now automatically updated through the useReadContract hooks
+    // We just need to format and set them when all data is available
+    if (
+      stakedTokenAddress &&
+      rewardTokenAddress &&
+      stakedTokenDecimals !== undefined &&
+      rewardTokenDecimals !== undefined &&
+      userInfo &&
+      pendingReward !== undefined &&
+      tokenBalance !== undefined &&
+      rewardTokenBalance !== undefined &&
+      stakedTokenAllowance !== undefined &&
+      stakedTokenBalanceContract !== undefined &&
+      stakedTokenSupply !== undefined &&
+      rewardPerBlock !== undefined
+    ) {
       try {
-        stakedTokenAddress = await stakingContract.stakedToken();
-        console.log("Staked token address:", stakedTokenAddress);
-      } catch (stakedTokenError) {
-        console.error("Error calling stakedToken():", stakedTokenError);
+        // Calculate APY
+        let fourtyFiveDaysApy = "0";
+        let ninetyDaysApy = "0";
+
+        try {
+          if (rewardPerBlock !== null && stakedTokenBalanceContract !== null) {
+            const rewardPerBlockFormatted = ethers.formatUnits(
+              rewardPerBlock as bigint,
+              rewardTokenDecimals
+            );
+
+            // Calculate rewards per year using dynamic block execution time
+            const currentBlockTime = userBalances?.perBlockExecutionTime || 12;
+            const blocksPerFourtyFiveDays =
+              (45 * 24 * 60 * 60) / currentBlockTime;
+            const blocksPerNinetyDays = (90 * 24 * 60 * 60) / currentBlockTime;
+            const rewardsPerFourtyFiveDays =
+              Number(rewardPerBlockFormatted) * Number(blocksPerFourtyFiveDays);
+            const rewardsPerNinetyFiveDays =
+              Number(rewardPerBlockFormatted) * Number(blocksPerNinetyDays);
+
+            const totalStaked = ethers.formatUnits(
+              stakedTokenBalanceContract as bigint,
+              stakedTokenDecimals
+            );
+
+            if (Number(totalStaked) > 0) {
+              const apyFourtyFiveDays =
+                Number(rewardsPerFourtyFiveDays) / Number(totalStaked);
+              const apyNinetyDays =
+                Number(rewardsPerNinetyFiveDays) / Number(totalStaked);
+              fourtyFiveDaysApy = apyFourtyFiveDays.toString();
+              ninetyDaysApy = apyNinetyDays.toString();
+            }
+          }
+        } catch (error) {
+          console.error("Error calculating APY:", error);
+        }
+
+        console.log("Formatting balances with:");
         console.log(
-          "This might mean the contract doesn't have stakedToken() function"
+          "pendingReward:",
+          pendingReward,
+          "type:",
+          typeof pendingReward
         );
-        setUserBalances(null);
-        return;
-      }
-
-      try {
-        rewardTokenAddress = await stakingContract.rewardToken();
-        console.log("Reward token address:", rewardTokenAddress);
-      } catch (rewardTokenError) {
-        console.error("Error calling rewardToken():", rewardTokenError);
         console.log(
-          "This might mean the contract doesn't have rewardToken() function"
+          "tokenBalance:",
+          tokenBalance,
+          "type:",
+          typeof tokenBalance
         );
-        setUserBalances(null);
-        return;
-      }
-
-      const stakedTokenContract = new ethers.Contract(
-        stakedTokenAddress,
-        erc20Abi,
-        signer
-      );
-      const rewardTokenContract = new ethers.Contract(
-        rewardTokenAddress,
-        erc20Abi,
-        signer
-      );
-
-      const userInfo = await stakingContract.userInfo(signer.address);
-
-      const stakedTokenSupply = await stakingContract.stakedTokenSupply();
-      const pendingReward = await stakingContract.pendingReward(signer.address);
-
-      const stakedTokenBalance = userInfo.amount;
-
-      const stakedTokenBalanceContract = await stakedTokenContract.balanceOf(
-        STAKING_CONTRACT_ADDRESS
-      );
-
-      const tokenBalance = await stakedTokenContract.balanceOf(signer.address);
-      const rewardTokenBalance = await rewardTokenContract.balanceOf(
-        signer.address
-      );
-      const stakedTokenAllowance = await stakedTokenContract.allowance(
-        signer.address,
-        STAKING_CONTRACT_ADDRESS
-      );
-      const nativeBalance = await provider.getBalance(signer.address);
-
-      const stakedTokenDecimals = await stakedTokenContract.decimals();
-      const rewardTokenDecimals = await rewardTokenContract.decimals();
-
-      let fourtyFiveDaysApy = "0";
-      let ninetyDaysApy = "0";
-
-      try {
-        let rewardPerBlock = await stakingContract.rewardPerBlock();
-        rewardPerBlock = ethers.formatUnits(
-          rewardPerBlock,
-          rewardTokenDecimals
-        );
-
-        // Calculate rewards per year using dynamic block execution time
-        const currentBlockTime = userBalances?.perBlockExecutionTime || 12;
-        const blocksPerFourtyFiveDays = (45 * 24 * 60 * 60) / currentBlockTime;
-        const blocksPerNinetyDays = (90 * 24 * 60 * 60) / currentBlockTime;
-        const rewardsPerFourtyFiveDays =
-          Number(rewardPerBlock) * Number(blocksPerFourtyFiveDays);
-        const rewardsPerNinetyFiveDays =
-          Number(rewardPerBlock) * Number(blocksPerNinetyDays);
-
-        // This would require getting total staked from the contract
-        // For now, we'll use a placeholder
-        const totalStaked = ethers.formatUnits(
+        console.log(
+          "stakedTokenBalanceContract:",
           stakedTokenBalanceContract,
-          stakedTokenDecimals
+          "type:",
+          typeof stakedTokenBalanceContract
+        );
+        console.log(
+          "userInfo[0]:",
+          userInfo && Array.isArray(userInfo) ? userInfo[0] : userInfo,
+          "type:",
+          typeof (userInfo && Array.isArray(userInfo) ? userInfo[0] : userInfo)
+        );
+        console.log(
+          "stakedTokenSupply:",
+          stakedTokenSupply,
+          "type:",
+          typeof stakedTokenSupply
+        );
+        console.log(
+          "rewardTokenBalance:",
+          rewardTokenBalance,
+          "type:",
+          typeof rewardTokenBalance
+        );
+        console.log(
+          "stakedTokenAllowance:",
+          stakedTokenAllowance,
+          "type:",
+          typeof stakedTokenAllowance
         );
 
-        if (Number(totalStaked) > 0) {
-          const apyFourtyFiveDays =
-            Number(rewardsPerFourtyFiveDays) / Number(totalStaked);
-          const apyNinetyDays =
-            Number(rewardsPerNinetyFiveDays) / Number(totalStaked);
-          fourtyFiveDaysApy = apyFourtyFiveDays.toString();
-          ninetyDaysApy = apyNinetyDays.toString();
-        }
+        const balances: UserBalances = {
+          stakedTokenAddress: stakedTokenAddress as string,
+          rewardTokenAddress: rewardTokenAddress as string,
+          pendingReward: fixedNumber(
+            pendingReward !== null
+              ? ethers.formatUnits(pendingReward as bigint, rewardTokenDecimals)
+              : "0",
+            2
+          ),
+          fourtyFiveDaysApy,
+          ninetyDaysApy,
+          tokenBalance: fixedNumber(
+            tokenBalance !== null
+              ? ethers.formatUnits(tokenBalance as bigint, stakedTokenDecimals)
+              : "0",
+            2
+          ),
+          stakedTokenBalanceContract: fixedNumber(
+            stakedTokenBalanceContract !== null
+              ? ethers.formatUnits(
+                  stakedTokenBalanceContract as bigint,
+                  stakedTokenDecimals
+                )
+              : "0",
+            2
+          ),
+          stakedTokenBalance: fixedNumber(
+            userInfo && Array.isArray(userInfo) && userInfo[0] !== null
+              ? ethers.formatUnits(userInfo[0] as bigint, stakedTokenDecimals)
+              : "0",
+            2
+          ),
+          stakedTokenSupply: fixedNumber(
+            stakedTokenSupply !== null
+              ? ethers.formatUnits(
+                  stakedTokenSupply as bigint,
+                  stakedTokenDecimals
+                )
+              : "0",
+            2
+          ),
+          rewardTokenBalance: fixedNumber(
+            rewardTokenBalance !== null
+              ? ethers.formatUnits(
+                  rewardTokenBalance as bigint,
+                  rewardTokenDecimals
+                )
+              : "0",
+            2
+          ),
+          stakedTokenAllowance:
+            stakedTokenAllowance !== null
+              ? ethers.formatUnits(
+                  stakedTokenAllowance as bigint,
+                  stakedTokenDecimals
+                )
+              : "0",
+          nativeBalance: "0", // We'll need to get this separately if needed
+        };
+
+        setUserBalances((prevBalances) => {
+          if (prevBalances) {
+            return {
+              ...prevBalances,
+              ...balances,
+            };
+          }
+          return balances;
+        });
+        console.log("User balances updated:", balances);
       } catch (error) {
-        console.error("Error calculating APY:", error);
+        console.error("Error formatting balances:", error);
       }
-
-      const balances: UserBalances = {
-        stakedTokenAddress,
-        rewardTokenAddress,
-        pendingReward: fixedNumber(
-          ethers.formatUnits(pendingReward, rewardTokenDecimals),
-          2
-        ),
-        fourtyFiveDaysApy,
-        ninetyDaysApy,
-        tokenBalance: ethers.formatUnits(tokenBalance, stakedTokenDecimals),
-        // tokenBalance: tokenBalance.toString(),
-        stakedTokenBalanceContract: fixedNumber(
-          ethers.formatUnits(stakedTokenBalanceContract, stakedTokenDecimals),
-          2
-        ),
-        stakedTokenBalance: fixedNumber(
-          ethers.formatUnits(stakedTokenBalance, stakedTokenDecimals),
-          2
-        ),
-        stakedTokenSupply: fixedNumber(
-          ethers.formatUnits(stakedTokenSupply, stakedTokenDecimals),
-          2
-        ),
-        // rewardTokenBalance: ethers.formatUnits(
-        //   rewardTokenBalance,
-        //   rewardTokenDecimals
-        // ),
-        rewardTokenBalance: fixedNumber(
-          ethers.formatUnits(rewardTokenBalance, rewardTokenDecimals),
-          2
-        ),
-        stakedTokenAllowance: ethers.formatUnits(
-          stakedTokenAllowance,
-          stakedTokenDecimals
-        ),
-        nativeBalance: ethers.formatUnits(nativeBalance),
-      };
-
-      setUserBalances((prevBalances) => {
-        if (prevBalances) {
-          return {
-            ...prevBalances,
-            ...balances,
-          };
-        }
-        return prevBalances;
-      });
-      console.log("User balances updated:", balances);
-    } catch (error) {
-      console.error("Error fetching user balances:", error);
-      setUserBalances(null);
-    } finally {
-      setIsLoadingBalances(false);
     }
   };
 
@@ -531,15 +665,27 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     }
   }, [isConnected, setConnectWalletLabel, address]);
 
-  // Fetch balances when user connects
+  // Update balances when contract data changes
   useEffect(() => {
     if (isConnected && address) {
       fetchUserBalances();
     }
-    //  else {
-    //   setUserBalances(null);
-    // }
-  }, [isConnected, address]);
+  }, [
+    isConnected,
+    address,
+    stakedTokenAddress,
+    rewardTokenAddress,
+    stakedTokenDecimals,
+    rewardTokenDecimals,
+    userInfo,
+    pendingReward,
+    tokenBalance,
+    rewardTokenBalance,
+    stakedTokenAllowance,
+    stakedTokenBalanceContract,
+    stakedTokenSupply,
+    rewardPerBlock,
+  ]);
 
   // Fetch total staked amount when component mounts (no wallet connection required)
   useEffect(() => {

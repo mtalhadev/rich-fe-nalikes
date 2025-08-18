@@ -1,5 +1,12 @@
 import { useWallet } from "@/contexts/WalletContext";
-import { useAccount, useSwitchChain } from "wagmi";
+import {
+  useAccount,
+  useSwitchChain,
+  useWriteContract,
+  useReadContract,
+  useWalletClient,
+  useWaitForTransactionReceipt,
+} from "wagmi";
 import { TARGET_CHAIN } from "@/config/chains";
 import { showToast } from "@/components/CustomToast";
 import { ethers } from "ethers";
@@ -8,6 +15,7 @@ import {
   STAKING_CONTRACT_ABI,
   STAKING_CONTRACT_ADDRESS,
 } from "../../utils/constants";
+import { useEffect, useState } from "react";
 
 // Function to add chain to MetaMask
 const addChainToMetaMask = async () => {
@@ -47,6 +55,10 @@ const addChainToMetaMask = async () => {
 
 export const useWalletOperations = () => {
   const { showStakingSuccessModal, userBalances } = useWallet();
+
+  // State for staking flow
+  const [stakingAmount, setStakingAmount] = useState<string>("");
+  const [isStakingFlowActive, setIsStakingFlowActive] = useState(false);
 
   // Helper function to get user-friendly error messages
   const getErrorMessage = (error: any, action: string): string => {
@@ -111,9 +123,283 @@ export const useWalletOperations = () => {
 
   const { chain } = useAccount();
   const { switchChain, switchChainAsync } = useSwitchChain();
+  const { data: walletClient } = useWalletClient();
 
   // Check if user is on the correct chain
   const isOnCorrectChain = chain?.id === TARGET_CHAIN.id;
+
+  // Read contract hooks for staking contract - ALL HOOKS MUST BE AT TOP LEVEL
+  const { data: stakedTokenAddress, refetch: refetchStakedTokenAddress } =
+    useReadContract({
+      address: STAKING_CONTRACT_ADDRESS as `0x${string}`,
+      abi: STAKING_CONTRACT_ABI,
+      functionName: "stakedToken",
+      query: {
+        enabled: !!STAKING_CONTRACT_ADDRESS,
+      },
+    });
+
+  const { data: rewardTokenAddress, refetch: refetchRewardTokenAddress } =
+    useReadContract({
+      address: STAKING_CONTRACT_ADDRESS as `0x${string}`,
+      abi: STAKING_CONTRACT_ABI,
+      functionName: "rewardToken",
+      query: {
+        enabled: !!STAKING_CONTRACT_ADDRESS,
+      },
+    });
+
+  // User-specific read contract hooks
+  const { data: userInfo, refetch: refetchUserInfo } = useReadContract({
+    address: STAKING_CONTRACT_ADDRESS as `0x${string}`,
+    abi: STAKING_CONTRACT_ABI,
+    functionName: "userInfo",
+    args: address ? [address] : undefined,
+    query: {
+      enabled: !!STAKING_CONTRACT_ADDRESS && !!address,
+    },
+  });
+
+  const { data: pendingReward, refetch: refetchPendingReward } =
+    useReadContract({
+      address: STAKING_CONTRACT_ADDRESS as `0x${string}`,
+      abi: STAKING_CONTRACT_ABI,
+      functionName: "pendingReward",
+      args: address ? [address] : undefined,
+      query: {
+        enabled: !!STAKING_CONTRACT_ADDRESS && !!address,
+      },
+    });
+
+  // Block-related read contract hooks
+  const { data: bonusEndBlock, refetch: refetchBonusEndBlock } =
+    useReadContract({
+      address: STAKING_CONTRACT_ADDRESS as `0x${string}`,
+      abi: STAKING_CONTRACT_ABI,
+      functionName: "stakeEndBlock",
+      query: {
+        enabled: !!STAKING_CONTRACT_ADDRESS,
+      },
+    });
+
+  // Token-related read contract hooks
+  const { data: tokenDecimals, refetch: refetchTokenDecimals } =
+    useReadContract({
+      address: stakedTokenAddress as `0x${string}`,
+      abi: erc20Abi,
+      functionName: "decimals",
+      query: {
+        enabled: !!stakedTokenAddress,
+      },
+    });
+
+  const { data: userTokenBalance, refetch: refetchUserTokenBalance } =
+    useReadContract({
+      address: stakedTokenAddress as `0x${string}`,
+      abi: erc20Abi,
+      functionName: "balanceOf",
+      args: address ? [address as `0x${string}`] : undefined,
+      query: {
+        enabled: !!stakedTokenAddress && !!address,
+      },
+    });
+
+  const { data: tokenAllowance, refetch: refetchTokenAllowance } =
+    useReadContract({
+      address: stakedTokenAddress as `0x${string}`,
+      abi: erc20Abi,
+      functionName: "allowance",
+      args:
+        address && STAKING_CONTRACT_ADDRESS
+          ? [
+              address as `0x${string}`,
+              STAKING_CONTRACT_ADDRESS as `0x${string}`,
+            ]
+          : undefined,
+      query: {
+        enabled:
+          !!stakedTokenAddress && !!address && !!STAKING_CONTRACT_ADDRESS,
+      },
+    });
+
+  // Write contract hooks
+  const {
+    writeContract: writeStakingContract,
+    isPending: isStakingPending,
+    data: stakingData,
+    reset: resetStakingContract,
+    error: stakingError,
+  } = useWriteContract();
+  const {
+    writeContract: writeTokenContract,
+    isPending: isApprovalPending,
+    data: approvalData,
+    reset: resetTokenContract,
+    error: approvalError,
+  } = useWriteContract();
+
+  // Transaction status tracking hooks
+  const {
+    isLoading: isApprovalConfirming,
+    isSuccess: isApprovalSuccess,
+    isError: isApprovalError,
+  } = useWaitForTransactionReceipt({
+    hash: approvalData,
+  });
+
+  const {
+    isLoading: isStakingConfirming,
+    isSuccess: isStakingSuccess,
+    isError: isStakingError,
+  } = useWaitForTransactionReceipt({
+    hash: stakingData,
+  });
+
+  useEffect(() => {
+    if (stakingError) {
+      showToast("error", "Staking failed. Please try again.");
+    }
+  }, [stakingError]);
+
+  useEffect(() => {
+    if (approvalError) {
+      showToast("error", "Approval failed. Please try again.");
+    }
+  }, [approvalError]);
+
+  // Handle approval success - automatically proceed to staking
+  useEffect(() => {
+    if (isApprovalSuccess && isStakingFlowActive && stakingAmount) {
+      console.log("Approval successful, proceeding with staking...");
+      showToast("success", "Approval confirmed! Proceeding with staking...");
+
+      // Execute staking with the stored amount
+      executeStaking(stakingAmount);
+    }
+  }, [isApprovalSuccess, isStakingFlowActive, stakingAmount]);
+
+  // Handle staking success
+  useEffect(() => {
+    if (isStakingSuccess && isStakingFlowActive) {
+      console.log("Staking successful!");
+      showToast("success", "Staking successful!");
+      showStakingSuccessModal();
+
+      // Refresh all contract data to get latest balances
+      const refreshAllContractData = async () => {
+        try {
+          console.log("Refreshing all contract data immediately...");
+
+          // Refetch all the contract data
+          await Promise.all([
+            refetchStakedTokenAddress(),
+            refetchRewardTokenAddress(),
+            refetchUserInfo(),
+            refetchPendingReward(),
+            refetchBonusEndBlock(),
+            refetchTokenDecimals(),
+            refetchUserTokenBalance(),
+            refetchTokenAllowance(),
+          ]);
+
+          console.log("All contract data refreshed successfully");
+
+          // Also call the context's fetchUserBalances to format the new data
+          await fetchUserBalances();
+        } catch (error) {
+          console.error("Error refreshing contract data:", error);
+        }
+      };
+
+      refreshAllContractData();
+
+      // Reset staking flow
+      setIsStakingFlowActive(false);
+      setStakingAmount("");
+
+      // CRITICAL: Reset all transaction states to prevent false positives on next operation
+      console.log("Resetting all transaction states...");
+      resetStakingContract();
+      resetTokenContract();
+      // Note: useWaitForTransactionReceipt hooks will automatically reset when their hash changes
+    }
+  }, [isStakingSuccess, isStakingFlowActive, fetchUserBalances]);
+
+  // Handle approval error
+  useEffect(() => {
+    if (isApprovalError && isStakingFlowActive) {
+      console.error("Approval failed");
+      showToast("error", "Token approval failed. Please try again.");
+      setIsStakingFlowActive(false);
+      setStakingAmount("");
+
+      // Reset transaction states on error too
+      resetTokenContract();
+      // Note: useWaitForTransactionReceipt hooks will automatically reset when their hash changes
+    }
+  }, [isApprovalError, isStakingFlowActive]);
+
+  // Handle staking error
+  useEffect(() => {
+    if (isStakingError && isStakingFlowActive) {
+      console.error("Staking failed");
+      showToast("error", "Staking failed. Please try again.");
+      setIsStakingFlowActive(false);
+      setStakingAmount("");
+
+      // Reset transaction states on error too
+      resetStakingContract();
+      // Note: useWaitForTransactionReceipt hooks will automatically reset when their hash changes
+    }
+  }, [isStakingError, isStakingFlowActive]);
+
+  // Function to execute staking after approval
+  const executeStaking = (amount: string) => {
+    if (!stakedTokenAddress || !tokenDecimals) {
+      showToast("error", "Token information not available");
+      setIsStakingFlowActive(false);
+      setStakingAmount("");
+      return;
+    }
+
+    const amountToDeposit = ethers.parseUnits(amount, tokenDecimals);
+
+    console.log("Executing staking with amount:", amountToDeposit.toString());
+    showToast("info", "Executing staking transaction...");
+
+    writeStakingContract({
+      address: STAKING_CONTRACT_ADDRESS as `0x${string}`,
+      abi: STAKING_CONTRACT_ABI,
+      functionName: "deposit",
+      args: [amountToDeposit],
+    });
+  };
+
+  // Function to manually refresh all contract data (can be called from components)
+  const refreshAllBalances = async () => {
+    try {
+      console.log("Manually refreshing all contract data...");
+
+      // Refetch all contract data
+      await Promise.all([
+        refetchStakedTokenAddress(),
+        refetchRewardTokenAddress(),
+        refetchUserInfo(),
+        refetchPendingReward(),
+        refetchBonusEndBlock(),
+        refetchTokenDecimals(),
+        refetchUserTokenBalance(),
+        refetchTokenAllowance(),
+      ]);
+
+      console.log("Manual contract data refresh completed");
+
+      // Also call the context's fetchUserBalances to format the new data
+      await fetchUserBalances();
+    } catch (error) {
+      console.error("Error manually refreshing contract data:", error);
+    }
+  };
 
   // Common operations that can be used across components
   const handleStake = async (amount: string) => {
@@ -162,160 +448,54 @@ export const useWalletOperations = () => {
       }
     }
 
-    // Add your staking logic here
     console.log("Staking on correct chain...", chain?.id, TARGET_CHAIN.id);
+
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum as any);
-      const signer = await provider.getSigner();
-      const stakingContract = new ethers.Contract(
-        STAKING_CONTRACT_ADDRESS,
-        STAKING_CONTRACT_ABI,
-        signer
-      );
-
-      // Check if staking is active
-      try {
-        const currentBlock = await provider.getBlockNumber();
-        const startBlock = await stakingContract.startBlock();
-        const stakeEndBlock = await stakingContract.stakeEndBlock();
-
-        const stakingActive =
-          currentBlock >= startBlock && currentBlock <= stakeEndBlock;
-
-        if (!stakingActive) {
-          showToast("error", "Staking is not active. Cannot deposit.");
-          return;
-        }
-        console.log("Staking is active");
-      } catch (error) {
-        console.log("Staking status check not available, continuing...");
+      if (!stakedTokenAddress || !tokenDecimals) {
+        showToast("error", "Token information not available");
+        return;
       }
 
-      const stakedTokenAddress = await stakingContract.stakedToken();
-      const stakedTokenContract = new ethers.Contract(
-        stakedTokenAddress,
-        erc20Abi,
-        signer
-      );
-      const decimals = await stakedTokenContract.decimals();
-
-      const amountToDeposit = ethers.parseUnits(amount, decimals);
+      const amountToDeposit = ethers.parseUnits(amount, tokenDecimals);
 
       // Check if user has enough tokens
-      const userBalance = await stakedTokenContract.balanceOf(signer.address);
-      console.log("User balance:", userBalance.toString());
-
-      console.log("Amount to deposit:", amountToDeposit.toString());
-
-      if (userBalance < amountToDeposit) {
+      if (!userTokenBalance || userTokenBalance < amountToDeposit) {
         showToast("error", "Insufficient token balance");
         return;
       }
 
-      // Check user limit if applicable
-      try {
-        const hasUserLimit = await stakingContract.hasUserLimit();
-        if (hasUserLimit) {
-          const userInfo = await stakingContract.userInfo(signer.address);
-          const poolLimitPerUser = await stakingContract.poolLimitPerUser();
-
-          // Convert to BigInt for comparison
-          const currentAmount = BigInt(userInfo.amount.toString());
-          const limit = BigInt(poolLimitPerUser.toString());
-          const depositAmount = BigInt(amountToDeposit.toString());
-
-          if (currentAmount + depositAmount > limit) {
-            showToast("error", "Amount exceeds user limit");
-            return;
-          }
-        }
-      } catch (error) {
-        console.log("User limit check not available, continuing...");
-      }
-
       // Check allowance
-      const allowance = await stakedTokenContract.allowance(
-        signer.address,
-        STAKING_CONTRACT_ADDRESS
-      );
-
-      console.log("Allowance:", allowance.toString());
-      console.log("Amount to deposit:", amountToDeposit.toString());
-
-      // Convert allowance to BigNumber if it's not already
-      const allowanceBN = ethers.parseUnits(allowance.toString(), 0);
-
-      if (allowanceBN < amountToDeposit) {
-        console.log("Approving tokens for staking contract...");
-        showToast("info", "Approving tokens for staking contract...");
-        const approveTx = await stakedTokenContract.approve(
-          STAKING_CONTRACT_ADDRESS,
-          amountToDeposit
-        );
-        await approveTx.wait();
-        console.log("Approval successful");
-        showToast("success", "Approval successful");
-      }
-
-      // Estimate gas
-      let gasLimit;
-      try {
-        const gasEstimate = await stakingContract.deposit.estimateGas(
-          amountToDeposit
-        );
-
-        gasLimit = (gasEstimate * BigInt(120)) / BigInt(100); // 20% buffer
-        console.log("Estimated gas:", gasEstimate.toString());
-      } catch (error: any) {
-        console.log("Gas estimation failed, using hardcoded limit", error);
-
-        gasLimit = ethers.parseUnits("500000", 0); // 500k gas
-      }
-
-      console.log("Using gas limit:", gasLimit.toString());
-
-      // Execute deposit
-      showToast("info", "Depositing tokens...");
-      console.log("Depositing tokens...", amountToDeposit.toString());
-
-      try {
-        const depositTx = await stakingContract.deposit(amountToDeposit, {
-          gasLimit: gasLimit,
-        });
-
-        console.log("Deposit transaction sent:", depositTx.hash);
-        showToast("info", "Transaction sent! Waiting for confirmation...");
-        const receipt = await depositTx.wait();
-        console.log("Deposit successful! Block:", receipt.blockNumber);
-        showToast("success", "Deposit successful!");
-        showStakingSuccessModal();
-
-        // Refresh user balances after successful deposit
-        try {
-          // Small delay to ensure blockchain state is updated
-          // await new Promise((resolve) => setTimeout(resolve, 2000));
-          await fetchUserBalances();
-          console.log("User balances refreshed after deposit");
-        } catch (error) {
-          console.error("Failed to refresh balances after deposit:", error);
-        }
-      } catch (error: any) {
-        console.error("Deposit transaction failed:", error);
-
-        // Try to extract more specific error information
-        if (error.data) {
-          console.log("Transaction error data:", error.data);
-        }
-
-        console.log("Transaction error:", error);
-
-        showToast("error", getErrorMessage(error, "deposit"));
+      if (tokenAllowance === undefined) {
+        showToast("error", "Failed to get allowance");
         return;
       }
-    } catch (error) {
-      console.error("Error depositing:", error);
 
-      showToast("error", getErrorMessage(error, "deposit"));
+      // Store amount for later use in the flow
+      setStakingAmount(amount);
+      setIsStakingFlowActive(true);
+
+      // If allowance is insufficient, approve first
+      if (tokenAllowance < amountToDeposit) {
+        console.log("Approving tokens for staking contract...");
+        showToast("info", "Approving tokens for staking contract...");
+
+        writeTokenContract({
+          address: stakedTokenAddress as `0x${string}`,
+          abi: erc20Abi,
+          functionName: "approve",
+          args: [STAKING_CONTRACT_ADDRESS as `0x${string}`, amountToDeposit],
+        });
+
+        // Don't return here - let the useEffect handle the flow
+      } else {
+        // If allowance is sufficient, proceed directly to staking
+        executeStaking(amount);
+      }
+    } catch (error) {
+      console.error("Error in staking flow:", error);
+      showToast("error", getErrorMessage(error, "start staking"));
+      setIsStakingFlowActive(false);
+      setStakingAmount("");
     }
   };
 
@@ -337,94 +517,31 @@ export const useWalletOperations = () => {
     }
 
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum as any);
-      const signer = await provider.getSigner();
-      const stakingContract = new ethers.Contract(
-        STAKING_CONTRACT_ADDRESS,
-        STAKING_CONTRACT_ABI,
-        signer
-      );
-
-      // Check if bonus period has ended
-      try {
-        const currentBlock = await provider.getBlockNumber();
-        const bonusEndBlock = await stakingContract.bonusEndBlock();
-
-        if (currentBlock <= bonusEndBlock) {
-          showToast(
-            "error",
-            "Cannot withdraw yet. Bonus period has not ended."
-          );
-          return;
-        }
-        console.log("Bonus period has ended, withdrawal allowed");
-      } catch (error) {
-        console.log("Bonus period check not available, continuing...");
-      }
-
-      // Get user's staked amount
-      const userInfo = await stakingContract.userInfo(signer.address);
-      const stakedAmount = userInfo.amount;
-
-      if (stakedAmount <= 0) {
+      // Use userInfo directly from the hook result
+      if (!userInfo || !Array.isArray(userInfo) || userInfo[0] <= BigInt(0)) {
         showToast("warning", "You have no tokens staked to withdraw");
         return;
       }
 
-      // Convert staked amount to human readable format for display
-      const stakedTokenAddress = await stakingContract.stakedToken();
-      const stakedTokenContract = new ethers.Contract(
-        stakedTokenAddress,
-        erc20Abi,
-        signer
-      );
-      const decimals = await stakedTokenContract.decimals();
-      const stakedAmountFormatted = ethers.formatUnits(stakedAmount, decimals);
-
-      console.log("Withdrawing all staked tokens:", stakedAmountFormatted);
-
-      // Check user has enough staked (this is redundant since we're withdrawing all, but keeping for consistency)
-      if (stakedAmount <= 0) {
-        showToast("error", "Insufficient staked amount");
-        return;
-      }
-
-      // Estimate gas
-      let gasLimit;
-      try {
-        const gasEstimate = await stakingContract.withdraw.estimateGas(
-          stakedAmount
-        );
-        gasLimit = (gasEstimate * BigInt(120)) / BigInt(100); // 20% buffer
-        console.log("Estimated gas:", gasEstimate.toString());
-      } catch (error) {
-        console.log("Gas estimation failed, using hardcoded limit", error);
-        gasLimit = ethers.parseUnits("500000", 0); // 500k gas
-      }
-
-      console.log("Using gas limit:", gasLimit.toString());
+      const stakedAmount = userInfo[0];
 
       // Execute withdraw
       showToast("info", "Withdrawing tokens...");
-      const withdrawTx = await stakingContract.withdraw(stakedAmount, {
-        gasLimit: gasLimit,
+
+      writeStakingContract({
+        address: STAKING_CONTRACT_ADDRESS as `0x${string}`,
+        abi: STAKING_CONTRACT_ABI,
+        functionName: "withdraw",
+        args: [stakedAmount],
       });
 
-      console.log("Withdraw transaction sent:", withdrawTx.hash);
-      showToast("info", "Transaction sent! Waiting for confirmation...");
-      const receipt = await withdrawTx.wait();
-      console.log("Withdraw successful! Block:", receipt.blockNumber);
-      showToast("success", "Withdraw successful!");
+      showToast("success", "Withdraw transaction sent!");
 
       // Refresh user balances after successful withdraw
-      try {
-        // Small delay to ensure blockchain state is updated
-        // await new Promise((resolve) => setTimeout(resolve, 2000));
-        await fetchUserBalances();
+      setTimeout(() => {
+        fetchUserBalances();
         console.log("User balances refreshed after withdraw");
-      } catch (error) {
-        console.error("Failed to refresh balances after withdraw:", error);
-      }
+      }, 2000);
     } catch (error) {
       console.error("Error withdrawing:", error);
       showToast("error", getErrorMessage(error, "withdraw"));
@@ -449,71 +566,32 @@ export const useWalletOperations = () => {
     }
 
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum as any);
-      const signer = await provider.getSigner();
-      const stakingContract = new ethers.Contract(
-        STAKING_CONTRACT_ADDRESS,
-        STAKING_CONTRACT_ABI,
-        signer
-      );
-
-      const userAddress = signer.address;
-      const pendingReward = await stakingContract.pendingReward(userAddress);
-
-      if (pendingReward <= 0) {
+      // Use pendingReward directly from the hook result
+      if (
+        !pendingReward ||
+        typeof pendingReward !== "bigint" ||
+        pendingReward <= BigInt(0)
+      ) {
         showToast("warning", "No pending rewards to claim");
         return;
       }
 
-      // Convert pending reward to human readable format for display
-      const rewardTokenAddress = await stakingContract.rewardToken();
-      const rewardTokenContract = new ethers.Contract(
-        rewardTokenAddress,
-        erc20Abi,
-        signer
-      );
-      const decimals = await rewardTokenContract.decimals();
-      const pendingRewardFormatted = ethers.formatUnits(
-        pendingReward,
-        decimals
-      );
-
-      console.log("Pending rewards:", pendingRewardFormatted);
-
-      // Estimate gas
-      let gasLimit;
-      try {
-        const gasEstimate = await stakingContract.claim.estimateGas();
-        gasLimit = (gasEstimate * BigInt(120)) / BigInt(100); // 20% buffer
-        console.log("Estimated gas:", gasEstimate.toString());
-      } catch (error) {
-        console.log("Gas estimation failed, using hardcoded limit", error);
-        gasLimit = ethers.parseUnits("500000", 0); // 500k gas
-      }
-
-      console.log("Using gas limit:", gasLimit.toString());
-
       // Execute claim
       showToast("info", "Claiming rewards...");
-      const claimTx = await stakingContract.claim({
-        gasLimit: gasLimit,
+
+      writeStakingContract({
+        address: STAKING_CONTRACT_ADDRESS as `0x${string}`,
+        abi: STAKING_CONTRACT_ABI,
+        functionName: "claim",
       });
 
-      console.log("Claim transaction sent:", claimTx.hash);
-      showToast("info", "Transaction sent! Waiting for confirmation...");
-      const receipt = await claimTx.wait();
-      console.log("Claim successful! Block:", receipt.blockNumber);
-      showToast("success", "Rewards claimed successfully!");
+      showToast("success", "Claim transaction sent!");
 
       // Refresh user balances after successful claim
-      try {
-        // Small delay to ensure blockchain state is updated
-        // await new Promise((resolve) => setTimeout(resolve, 2000));
-        await fetchUserBalances();
+      setTimeout(() => {
+        fetchUserBalances();
         console.log("User balances refreshed after claim");
-      } catch (error) {
-        console.error("Failed to refresh balances after claim:", error);
-      }
+      }, 2000);
     } catch (error) {
       console.error("Error claiming rewards:", error);
       showToast("error", getErrorMessage(error, "claim rewards"));
@@ -538,67 +616,28 @@ export const useWalletOperations = () => {
     }
 
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum as any);
-      const signer = await provider.getSigner();
-      const stakingContract = new ethers.Contract(
-        STAKING_CONTRACT_ADDRESS,
-        STAKING_CONTRACT_ABI,
-        signer
-      );
-
-      // Get user's staked amount
-      const userInfo = await stakingContract.userInfo(signer.address);
-      const stakedAmount = userInfo.amount;
-
-      if (stakedAmount <= 0) {
+      // Use userInfo directly from the hook result
+      if (!userInfo || !Array.isArray(userInfo) || userInfo[0] <= BigInt(0)) {
         showToast("warning", "You have no tokens staked to emergency withdraw");
         return;
       }
 
-      // Convert staked amount to human readable format for display
-      const stakedTokenAddress = await stakingContract.stakedToken();
-      const stakedTokenContract = new ethers.Contract(
-        stakedTokenAddress,
-        erc20Abi,
-        signer
-      );
-      const decimals = await stakedTokenContract.decimals();
-      const stakedAmountFormatted = ethers.formatUnits(stakedAmount, decimals);
-
-      console.log(
-        "Emergency withdrawing all staked tokens:",
-        stakedAmountFormatted
-      );
-
-      // Hardcoded gas limit (temporary until contract is updated)
-      const hardcodedGasLimit = ethers.parseUnits("500000", 0); // 500k gas
-      console.log("Using hardcoded gas limit:", hardcodedGasLimit.toString());
-
       // Execute emergency withdraw
-      const emergencyWithdrawTx = await stakingContract.emergencyWithdraw({
-        gasLimit: hardcodedGasLimit,
+      showToast("info", "Emergency withdrawing tokens...");
+
+      writeStakingContract({
+        address: STAKING_CONTRACT_ADDRESS as `0x${string}`,
+        abi: STAKING_CONTRACT_ABI,
+        functionName: "emergencyWithdraw",
       });
 
-      console.log(
-        "Emergency withdraw transaction sent:",
-        emergencyWithdrawTx.hash
-      );
-      const receipt = await emergencyWithdrawTx.wait();
-      console.log("Emergency withdraw successful! Block:", receipt.blockNumber);
-      showToast("success", "Emergency withdraw successful");
+      showToast("success", "Emergency withdraw transaction sent!");
 
       // Refresh user balances after successful emergency withdraw
-      try {
-        // Small delay to ensure blockchain state is updated
-        // await new Promise((resolve) => setTimeout(resolve, 2000));
-        await fetchUserBalances();
+      setTimeout(() => {
+        fetchUserBalances();
         console.log("User balances refreshed after emergency withdraw");
-      } catch (error) {
-        console.error(
-          "Failed to refresh balances after emergency withdraw:",
-          error
-        );
-      }
+      }, 2000);
     } catch (error) {
       console.error("Error emergency withdrawing:", error);
       showToast("error", getErrorMessage(error, "emergency withdraw"));
@@ -607,20 +646,30 @@ export const useWalletOperations = () => {
 
   // Function to calculate unstake timer
   const calculateUnstakeTimer = async () => {
+    console.log("calculateUnstakeTimer");
+    console.log("isConnected", isConnected);
+    console.log("STAKING_CONTRACT_ADDRESS", STAKING_CONTRACT_ADDRESS);
+    console.log("bonusEndBlock", bonusEndBlock);
+
     if (!isConnected || !STAKING_CONTRACT_ADDRESS) {
       return { timeRemaining: 0, canUnstake: false };
     }
 
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum as any);
-      const stakingContract = new ethers.Contract(
-        STAKING_CONTRACT_ADDRESS,
-        STAKING_CONTRACT_ABI,
-        provider
+      // Use public provider to get current block number
+      const publicProvider = new ethers.JsonRpcProvider(
+        process.env.NEXT_PUBLIC_RPC_URL
       );
+      const currentBlock = await publicProvider.getBlockNumber();
 
-      const currentBlock = await provider.getBlockNumber();
-      const bonusEndBlock = await stakingContract.stakeEndBlock();
+      // Use bonusEndBlock directly from the hook result
+      if (!bonusEndBlock) {
+        return { timeRemaining: 0, canUnstake: false };
+      }
+
+      console.log("currentBlock", currentBlock);
+      console.log("bonusEndBlock", bonusEndBlock);
+
       // Convert BigInt to Number for calculations
       const currentBlockNum = Number(currentBlock);
       const bonusEndBlockNum = Number(bonusEndBlock);
@@ -685,5 +734,21 @@ export const useWalletOperations = () => {
     // Timer functions
     calculateUnstakeTimer,
     formatTime,
+
+    // Loading states
+    isStakingPending,
+    isApprovalPending,
+    isStakingConfirming,
+    isApprovalConfirming,
+    isStakingFlowActive,
+
+    // Transaction status
+    isApprovalSuccess,
+    isStakingSuccess,
+    isApprovalError,
+    isStakingError,
+
+    // Utility functions
+    refreshAllBalances,
   };
 };

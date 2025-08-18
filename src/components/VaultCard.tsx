@@ -147,7 +147,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
   const balances = useMemo(
     () => ({
       stakedTokenSupply: userBalances?.stakedTokenSupply || "0",
-      userBalance: userBalances?.tokenBalance || "0",
+      userBalance: userBalances?.tokenBalance || 0,
       userStakedBalance: userBalances?.stakedTokenBalance || "0",
       pendingReward: userBalances?.pendingReward || "0",
       stakedAmount: userBalances?.stakedTokenAllowance || "0", // This will be updated to actual staked amount
@@ -171,8 +171,6 @@ const VaultCard: React.FC<VaultCardProps> = ({
     return apyValue;
   }, [days, userBalances?.fourtyFiveDaysApy, userBalances?.ninetyDaysApy]);
 
-  const maxStakeAmount = useMemo(() => parseFloat(userBalance), [userBalance]);
-
   // Validate stake amount - memoized to prevent recreation
   const validateStakeAmount = useCallback(
     (amount: string) => {
@@ -180,12 +178,12 @@ const VaultCard: React.FC<VaultCardProps> = ({
       if (isNaN(numAmount) || numAmount <= 0) {
         return "Please enter a valid amount greater than 0";
       }
-      if (numAmount > maxStakeAmount) {
+      if (numAmount > userBalance) {
         return `Amount cannot exceed your balance of ${userBalance} ${tokenSymbol}`;
       }
       return null; // Valid
     },
-    [maxStakeAmount, userBalance, tokenSymbol]
+    [userBalance, tokenSymbol]
   );
 
   // Validate unstake operation - memoized to prevent recreation
@@ -372,14 +370,14 @@ const VaultCard: React.FC<VaultCardProps> = ({
                   const value = parseFloat(e.target.value) || 0;
                   const clampedValue = Math.min(
                     Math.max(value, 0),
-                    maxStakeAmount
+                    userBalance
                   );
                   setStakeAmount(clampedValue.toString());
                 }}
                 placeholder="0.0"
                 min="0"
-                max={maxStakeAmount}
-                disabled={maxStakeAmount === 0}
+                max={userBalance}
+                disabled={userBalance === 0}
                 className="h-fit p-0 text-xl md:text-5xl m-0 leading-0 font-normal bg-transparent border-none outline-none w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 transition-all duration-200 ease-in-out focus:scale-[1.02] w-full"
               />
             </span>
