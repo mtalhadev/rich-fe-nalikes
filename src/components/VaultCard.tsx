@@ -394,7 +394,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
           />
           {/* border for small screen below */}
           <span className="border-gradient-blue-bg h-[1px] w-full my-2 block sm:hidden" />
-          <div className="flex flex-col sm:gap-6 gap-2 md:w-[45.5%] items-end">
+          <div className="flex flex-col sm:gap-6 gap-2 md:w-[45.5%] md:items-end">
             <div className="flex flex-col sm:gap-4">
               <span className="renderStatsSection font-poppins text-xs md:text-base">
                 RWA

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useWallet } from "@/contexts/WalletContext";
 import Link from "next/link";
+import { LogOut, Copy, Check } from "lucide-react";
 
 interface MobileSidebarProps {
   isOpen: boolean;
@@ -10,9 +11,16 @@ interface MobileSidebarProps {
 }
 
 export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
-  const { isConnected, connectWallet } = useWallet();
+  const {
+    isConnected,
+    connectWallet,
+    disconnectWallet,
+    connectWalletLabel,
+    address,
+  } = useWallet();
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -22,6 +30,23 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
+
+  const handleCopyAddress = async () => {
+    if (isConnected && address) {
+      try {
+        await navigator.clipboard.writeText(address);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error("Failed to copy address:", err);
+      }
+    }
+  };
+
+  const handleDisconnect = () => {
+    disconnectWallet();
+    onClose();
+  };
 
   const handleNavigation = (href: string) => {
     onClose();
@@ -84,6 +109,38 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               </svg>
             </button>
           </div>
+
+          {/* Wallet Section - Show when connected */}
+          {isConnected && (
+            <div className="p-6 border-b border-white/20">
+              <div className="bg-white/10 rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-white text-sm font-medium">Wallet</span>
+                  <button
+                    onClick={handleCopyAddress}
+                    className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-all duration-200 active:scale-95 hover:scale-105"
+                    title="Copy Address"
+                  >
+                    {copied ? (
+                      <Check className="w-4 h-4 animate-bounce" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+                <div className="text-white text-sm font-mono break-all">
+                  {connectWalletLabel}
+                </div>
+                <button
+                  onClick={handleDisconnect}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg transition-all duration-200 active:scale-95 hover:scale-105 flex items-center justify-center gap-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Disconnect Wallet
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Navigation Links */}
           <div className="flex-1 py-6">

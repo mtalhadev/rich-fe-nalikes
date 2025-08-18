@@ -4,6 +4,8 @@ import { useWallet } from "@/contexts/WalletContext";
 import { NumericFormat } from "react-number-format";
 import { Poppins } from "next/font/google";
 import { formatLargeNumber } from "../../utils/helpers";
+import { useState } from "react";
+import { Check, Copy } from "lucide-react";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -11,7 +13,35 @@ const poppins = Poppins({
 });
 
 export default function HeroSection() {
-  const { userBalances, connectWallet, connectWalletLabel } = useWallet();
+  const {
+    userBalances,
+    connectWallet,
+    disconnectWallet,
+    connectWalletLabel,
+    isConnected,
+    address,
+  } = useWallet();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyAddress = async () => {
+    if (isConnected && address) {
+      try {
+        await navigator.clipboard.writeText(address);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+
+        // Show toast notification
+        if ("Notification" in window && Notification.permission === "granted") {
+          new Notification("Address Copied!", {
+            body: "Wallet address copied to clipboard",
+            icon: "/favicon.ico",
+          });
+        }
+      } catch (err) {
+        console.error("Failed to copy address:", err);
+      }
+    }
+  };
 
   const totalStaked = userBalances?.stakedTokenSupply || "0";
 
@@ -62,15 +92,31 @@ export default function HeroSection() {
               </div>
 
               <button
-                onClick={connectWallet}
+                onClick={isConnected ? handleCopyAddress : connectWallet}
                 type="button"
                 className="bg-gradient-to-r btn-shine from-[#1AD3E4] to-[#005FEB] 
-             border-2 border-secondary cursor-pointer text-white 
+              border-2 border-secondary cursor-pointer text-white 
             w-full h-[39px] sm:text-sm md:text-xl lg:text-lg 
              text-nowrap rounded-lg font-luckiest-guy 
              hover:opacity-90 transition-opacity sm:hidden block"
               >
-                {connectWalletLabel}
+                {isConnected ? (
+                  copied ? (
+                    <div className="flex items-center gap-2 justify-center">
+                      <span className="animate-pulse">Copied!</span>
+                      <Check className="w-4 h-4 animate-bounce" />
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 justify-center">
+                      <span className="font-mono text-xs">
+                        {connectWalletLabel}
+                      </span>
+                      <Copy className="w-4 h-4" />
+                    </div>
+                  )
+                ) : (
+                  connectWalletLabel
+                )}
               </button>
             </div>
 
