@@ -54,12 +54,13 @@ export default function HeroSection({
                   {"Buy RWA"}
                 </button>
               </Link>
-              <button
-                onClick={() => setIsStakingPopupOpen(true)}
+              <Link
+                href="/stake"
+                // onClick={() => setIsStakingPopupOpen(true)}
                 className="bg-gradient-to-r btn-shine from-[#1AD3E4] text-xs sm:text-sm text-nowrap md:text-xl lg:text-lg to-[#005FEB] border-2 border-secondary cursor-pointer text-white px-2 md:px-4 py-2 lg:py-1.5 rounded-xl lg:rounded-lg font-luckiest-guy hover:opacity-90 transition-opacity"
               >
                 Stake
-              </button>
+              </Link>
             </div>
             <button
               className="md:hidden block bg-gradient-to-r btn-shine from-[#1AD3E4] text-sm text-nowrap md:text-xl lg:text-lg to-[#005FEB] border-2 border-secondary cursor-pointer text-white px-1 py-1 lg:py-1.5 rounded-xl lg:rounded-lg font-luckiest-guy hover:opacity-90 transition-opacity"

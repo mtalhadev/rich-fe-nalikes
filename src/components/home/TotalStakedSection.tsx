@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface TotalStakedSectionProps {
   onStakeClick: () => void;
 }
@@ -54,15 +56,16 @@ export default function TotalStakedSection({
 
                 {/* Second Row - Stake Now Button (Full Width) */}
                 <div className="w-full">
-                  <button
-                    onClick={onStakeClick}
+                  <Link
+                    href="/stake"
+                    // onClick={onStakeClick}
                     className="w-full rounded-2xl bg-[#78B9DF] p-4 md:p-8 flex justify-center items-center md:min-h-[120px] hover:bg-[#78B9DF]/90 transition-colors cursor-pointer"
                   >
                     <h1 className="font-luckiest-guy text-2xl md:text-4xl text-white uppercase leading-none text-center">
                       STAKE
                       <br className="hidden md:block" /> NOW
                     </h1>
-                  </button>
+                  </Link>
                 </div>
               </div>
 
@@ -95,15 +98,16 @@ export default function TotalStakedSection({
                 </div>
 
                 {/* Stake Now Button Card */}
-                <button
-                  onClick={onStakeClick}
+                <Link
+                  href="/stake"
+                  // onClick={onStakeClick}
                   className="min-w-[200px] w-fit h-full gap-y-6 rounded-3xl bg-[#78B9DF] p-6 flex flex-col justify-between relative flex-shrink-0 hover:bg-[#78B9DF]/90 transition-colors cursor-pointer"
                 >
                   <h1 className="font-luckiest-guy text-6xl text-white text-wrap uppercase">
                     STAKE <br />
                     NOW
                   </h1>
-                </button>
+                </Link>
               </div>
             </div>
           </div>
