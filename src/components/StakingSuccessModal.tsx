@@ -44,7 +44,7 @@ export default function StakingSuccessModal() {
             <video
               autoPlay
               loop
-              muted
+              // muted
               playsInline
               className="rounded-lg shadow-lg max-w-full h-auto w-[300px] h-[300px] md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px]"
             >
