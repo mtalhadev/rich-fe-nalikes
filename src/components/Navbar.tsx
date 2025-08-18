@@ -45,7 +45,7 @@ export default function Navbar() {
   };
 
   return (
-    <div className="mb-8 sm:bg-[url('/bg-desktop.svg')] bg-[url('/stake-banner-bg.svg')] bg-no-repeat bg-cover bg-center max-h-[50dvh] sm:min-h-[80dvh] flex flex-col md:gap-y-4 lg:gap-y-3 items-center py-4 lg:py-3 w-full relative">
+    <div className="mb-8 sm:bg-[url('/bg-desktop.svg')] bg-[url('/stake-banner-bg.svg')] bg-no-repeat bg-cover bg-center max-h-[60dvh] sm:min-h-[80dvh] flex flex-col md:gap-y-4 lg:gap-y-3 items-center py-4 lg:py-3 w-full relative">
       <div className="max-w-7xl w-full mx-auto px-2 xs:px-4 sm:px-8 md:px-12 lg:px-18 flex flex-col h-fit items-center justify-between">
         <div className="w-full flex items-center justify-between gap-12">
           <Link

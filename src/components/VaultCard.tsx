@@ -641,7 +641,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
     >
       {/* background objects */}
 
-      <StakeBgObject className="block md:hidden absolute -top-[19px] left-0 w-[87%] h-[133px]" />
+      {/* <StakeBgObject className="block md:hidden absolute -top-[19px] left-0 w-[87%] h-[133px]" /> */}
       {/* blurry rectangle */}
       <div
         className="sm:hidden block absolute inset-x-0
