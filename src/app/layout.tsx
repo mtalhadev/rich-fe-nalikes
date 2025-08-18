@@ -7,6 +7,7 @@ import { WalletProvider } from "@/contexts/WalletContext";
 import "react-toastify/dist/ReactToastify.css";
 import AbstractWalletProviderClient from "./abstract-wallet-provider";
 import { Alfa_Slab_One, Noto_Sans, Nunito_Sans } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 
 const luckiestGuy = localFont({
   src: [
@@ -104,6 +105,7 @@ export default function RootLayout({
           <WalletProvider>{children}</WalletProvider>
           <ToastWrapper />
         </AbstractWalletProviderClient>
+        <Analytics />
       </body>
     </html>
   );
