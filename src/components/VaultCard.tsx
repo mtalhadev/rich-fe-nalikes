@@ -198,14 +198,14 @@ const VaultCard: React.FC<VaultCardProps> = ({
   }, [stakedAmount]);
 
   // Validate claim operation - memoized to prevent recreation
-  const validateClaim = useCallback(() => {
-    const rewardBalanceNum = parseFloat(pendingReward);
-    if (rewardBalanceNum <= 0) {
-      showToast("error", "No rewards available to claim");
-      return "No rewards available to claim";
-    }
-    return null; // Valid
-  }, [pendingReward]);
+  // const validateClaim = useCallback(() => {
+  //   const rewardBalanceNum = parseFloat(pendingReward);
+  //   if (rewardBalanceNum <= 0) {
+  //     showToast("error", "No rewards available to claim");
+  //     return "No rewards available to claim";
+  //   }
+  //   return null; // Valid
+  // }, [pendingReward]);
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 200 + (index || 0) * 200);
     return () => clearTimeout(timer);
