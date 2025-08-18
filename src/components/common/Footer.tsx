@@ -93,19 +93,19 @@ export default function Footer() {
               <div className="flex gap-3 md:gap-6">
                 <div className="space-y-3">
                   <a
-                    href="#"
+                    href="/"
                     className="block  text-[11px] text-[#0036AE] md:text-base font-nunito-sans "
                   >
                     Home
                   </a>
                   <a
-                    href="#wallpaper"
+                    href="/#wallpaper"
                     className="block text-[#0036AE] text-[11px] md:text-base font-nunito-sans  "
                   >
                     Wallpapers
                   </a>
                   <a
-                    href="#stickers"
+                    href="/#stickers"
                     className="block text-[#0036AE] text-[11px] md:text-base font-nunito-sans  "
                   >
                     Stickers
@@ -116,7 +116,7 @@ export default function Footer() {
                     href="#"
                     className="text-[#0036AE] text-[11px] md:text-base font-nunito-sans text-nowrap transition-colors underline"
                   >
-                    Term & Condition
+                    Terms & Condition
                   </a>
                   <a
                     href="#"
@@ -140,7 +140,7 @@ export default function Footer() {
                   href="#"
                   className="text-[#0036AE] font-nunito-sans  transition-colors underline"
                 >
-                  Term & Condition
+                  Terms & Condition
                 </a>
                 <a
                   href="#"

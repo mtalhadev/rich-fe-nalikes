@@ -31,13 +31,13 @@ export default function HeroSection({
           </div>
           <div className="flex items-center gap-x-2 md:gap-x-12">
             <a
-              href="#wallpaper"
+              href="/#wallpaper"
               className="text-white hidden md:block font-alfa text-lg hover:text-accent-yellow transition-colors"
             >
               Wallpapers
             </a>
             <a
-              href="#stickers"
+              href="/#stickers"
               className="text-white hidden md:block font-alfa text-lg hover:text-accent-yellow transition-colors"
             >
               Stickers
@@ -47,6 +47,8 @@ export default function HeroSection({
                 href={
                   "https://swap.reservoir.tools/#/swap?chain=abstract&outputCurrency=0xAf31d07AF1602Dfce07Fba81BcA5F9570CA83983"
                 }
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <button className="bg-gradient-to-r btn-shine from-[#1AD3E4] text-xs sm:text-sm text-nowrap md:text-xl lg:text-lg to-[#005FEB] border-2 border-secondary cursor-pointer text-white px-2 md:px-6 py-2 lg:py-1.5 rounded-xl lg:rounded-lg font-luckiest-guy hover:opacity-90 transition-opacity">
                   {"Buy RWA"}

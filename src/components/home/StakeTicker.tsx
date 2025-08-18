@@ -39,6 +39,8 @@ export default function StakeTicker() {
                 href={
                   "https://swap.reservoir.tools/#/swap?chain=abstract&outputCurrency=0xAf31d07AF1602Dfce07Fba81BcA5F9570CA83983"
                 }
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <button className="bg-gradient-to-r btn-shine from-[#1AD3E4] text-xs sm:text-sm text-nowrap md:text-lg to-[#005FEB] border-2 border-secondary cursor-pointer text-white px-2 sm:px-3 md:px-5 py-1 xs:py-2 lg:py-1 rounded-lg xs:rounded-xl lg:rounded-lg font-luckiest-guy hover:opacity-90 transition-opacity">
                   {"Buy RWA"}

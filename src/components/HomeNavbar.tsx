@@ -8,13 +8,13 @@ export default function HomeNavbar() {
       <Image src={Logo} alt="Logo" width={248} height={91} />
       <div className="flex items-center gap-x-10">
         <Link
-          href={""}
+          href={"/#wallpaper"}
           className="text-3xl hover:scale-105 active:scale-95  transition-all"
         >
           Wallpaper
         </Link>
         <Link
-          href={""}
+          href={"/#stickers"}
           className="text-3xl hover:scale-105 active:scale-95  transition-all"
         >
           Stickers

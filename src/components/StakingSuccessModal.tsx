@@ -20,7 +20,7 @@ export default function StakingSuccessModal() {
         {/* Close Button */}
         <button
           onClick={() => setIsStakingSuccessModalOpen(false)}
-          className="absolute top-4 right-4 text-white hover:text-gray-700 transition-colors"
+          className="absolute top-4 right-4 text-white hover:text-gray-700 transition-colors z-50"
         >
           <svg
             className="w-6 h-6"

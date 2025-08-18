@@ -5,11 +5,11 @@ import Button from "./Button";
 const NAV_ITEMS = [
   {
     label: "Wallpaper",
-    href: "/",
+    href: "/#wallpaper",
   },
   {
     label: "Stickers",
-    href: "/",
+    href: "/#stickers",
   },
 ];
 

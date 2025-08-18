@@ -19,7 +19,7 @@ const Images = [
 
 export default function RWAGiphySection() {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col" id="stickers">
       <h1 className="text-[#B8CEFF] opacity-20 text-center text-wrap text-[40px] sm:text-[70px] md:text-[120px] xl:text-[160px] font-luckiest-guy md:z-0 z-1">
         TENOR GIPHY
       </h1>

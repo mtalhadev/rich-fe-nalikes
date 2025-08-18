@@ -90,7 +90,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             <nav className="space-y-4 px-6">
               {/* Wallpapers */}
               <button
-                onClick={() => handleNavigation("#wallpaper")}
+                onClick={() => handleNavigation("/#wallpaper")}
                 className="w-full text-left text-white hover:text-accent-yellow transition-colors font-alfa text-lg"
               >
                 Wallpapers
@@ -98,7 +98,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
 
               {/* Stickers */}
               <button
-                onClick={() => handleNavigation("#stickers")}
+                onClick={() => handleNavigation("/#stickers")}
                 className="w-full text-left text-white hover:text-accent-yellow transition-colors font-alfa text-lg"
               >
                 Stickers
