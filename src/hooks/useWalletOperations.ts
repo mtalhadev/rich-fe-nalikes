@@ -207,7 +207,7 @@ export const useWalletOperations = () => {
 
       console.log("Amount to deposit:", amountToDeposit.toString());
 
-      if (userBalance < amount) {
+      if (userBalance < amountToDeposit) {
         showToast("error", "Insufficient token balance");
         return;
       }
@@ -260,7 +260,9 @@ export const useWalletOperations = () => {
       // Estimate gas
       let gasLimit;
       try {
-        const gasEstimate = await stakingContract.deposit.estimateGas(amount);
+        const gasEstimate = await stakingContract.deposit.estimateGas(
+          amountToDeposit
+        );
 
         gasLimit = (gasEstimate * BigInt(120)) / BigInt(100); // 20% buffer
         console.log("Estimated gas:", gasEstimate.toString());
@@ -274,10 +276,10 @@ export const useWalletOperations = () => {
 
       // Execute deposit
       showToast("info", "Depositing tokens...");
-      console.log("Depositing tokens...", amount);
+      console.log("Depositing tokens...", amountToDeposit.toString());
 
       try {
-        const depositTx = await stakingContract.deposit(amount, {
+        const depositTx = await stakingContract.deposit(amountToDeposit, {
           gasLimit: gasLimit,
         });
 

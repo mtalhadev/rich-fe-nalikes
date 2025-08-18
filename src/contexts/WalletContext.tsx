@@ -59,14 +59,14 @@ const addChainToMetaMask = async () => {
 interface UserBalances {
   tokenBalance: string;
   stakedTokenBalanceContract: number;
-  stakedTokenBalance: string;
+  stakedTokenBalance: number;
   stakedTokenSupply: number;
-  rewardTokenBalance: string;
+  rewardTokenBalance: number;
   stakedTokenAllowance: string;
   nativeBalance: string;
   stakedTokenAddress: string;
   rewardTokenAddress: string;
-  pendingReward: string;
+  pendingReward: number;
   fourtyFiveDaysApy: string;
   ninetyDaysApy: string;
   perBlockExecutionTime?: number;
@@ -120,14 +120,14 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const [userBalances, setUserBalances] = useState<UserBalances | null>({
     tokenBalance: "0",
     stakedTokenBalanceContract: 0,
-    stakedTokenBalance: "0",
+    stakedTokenBalance: 0,
     stakedTokenSupply: 0,
-    rewardTokenBalance: "0",
+    rewardTokenBalance: 0,
     stakedTokenAllowance: "0",
     nativeBalance: "0",
     stakedTokenAddress: "",
     rewardTokenAddress: "",
-    pendingReward: "0",
+    pendingReward: 0,
     fourtyFiveDaysApy: "0",
     ninetyDaysApy: "0",
     perBlockExecutionTime: 12,
@@ -468,7 +468,10 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
       const balances: UserBalances = {
         stakedTokenAddress,
         rewardTokenAddress,
-        pendingReward: pendingReward.toString(),
+        pendingReward: fixedNumber(
+          ethers.formatUnits(pendingReward, rewardTokenDecimals),
+          2
+        ),
         fourtyFiveDaysApy,
         ninetyDaysApy,
         tokenBalance: ethers.formatUnits(tokenBalance, stakedTokenDecimals),
@@ -477,7 +480,10 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
           ethers.formatUnits(stakedTokenBalanceContract, stakedTokenDecimals),
           2
         ),
-        stakedTokenBalance: stakedTokenBalance.toString(),
+        stakedTokenBalance: fixedNumber(
+          ethers.formatUnits(stakedTokenBalance, stakedTokenDecimals),
+          2
+        ),
         stakedTokenSupply: fixedNumber(
           ethers.formatUnits(stakedTokenSupply, stakedTokenDecimals),
           2
@@ -486,7 +492,10 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         //   rewardTokenBalance,
         //   rewardTokenDecimals
         // ),
-        rewardTokenBalance: rewardTokenBalance.toString(),
+        rewardTokenBalance: fixedNumber(
+          ethers.formatUnits(rewardTokenBalance, rewardTokenDecimals),
+          2
+        ),
         stakedTokenAllowance: ethers.formatUnits(
           stakedTokenAllowance,
           stakedTokenDecimals
