@@ -672,7 +672,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
               /> */}
               400%
             </p>
-            <p className="text-center font-poppins font-bold">APY</p>
+            <p className="text-center font-poppins font-bold">APR</p>
           </div>
         </div>
 

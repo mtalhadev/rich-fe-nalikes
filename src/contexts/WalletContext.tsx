@@ -514,12 +514,13 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
 
   // Update connect wallet label based on connection state
   useEffect(() => {
-    if (isConnected) {
-      setConnectWalletLabel("DISCONNECT WALLET");
+    if (isConnected && address) {
+      // setConnectWalletLabel("DISCONNECT WALLET");
+      setConnectWalletLabel(address.slice(0, 6) + "..." + address.slice(-4));
     } else {
       setConnectWalletLabel("CONNECT WALLET");
     }
-  }, [isConnected, setConnectWalletLabel]);
+  }, [isConnected, setConnectWalletLabel, address]);
 
   // Fetch balances when user connects
   useEffect(() => {

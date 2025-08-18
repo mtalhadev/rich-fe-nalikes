@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { formatLargeNumber } from "../../../utils/helpers";
+import { useWallet } from "@/contexts/WalletContext";
 
 interface TotalStakedSectionProps {
   onStakeClick: () => void;
@@ -7,6 +9,10 @@ interface TotalStakedSectionProps {
 export default function TotalStakedSection({
   onStakeClick,
 }: TotalStakedSectionProps) {
+  const { userBalances } = useWallet();
+
+  const totalStaked = userBalances?.stakedTokenSupply || "0";
+
   return (
     <div className="relative w-screen h-full">
       <div className="max-w-6xl mx-auto w-full h-[120px] xs:h-[50px] sm:h-[450px] lg:pt-5 lg:h-fit flex flex-col justify-center relative">
@@ -33,7 +39,7 @@ export default function TotalStakedSection({
                     </h1>
                     <div className="flex items-end gap-x-1 mt-2">
                       <span className="text-3xl leading-none font-luckiest-guy text-[#2e6385]">
-                        0M
+                        {formatLargeNumber(totalStaked) || 0}
                       </span>
                       <span className="font-luckiest-guy text-xs text-navy mb-1">
                         RWA
@@ -77,7 +83,7 @@ export default function TotalStakedSection({
                   </h1>
                   <div className="flex items-end gap-x-2">
                     <span className="text-6xl leading-none font-luckiest-guy text-dark-gray">
-                      0M
+                      {formatLargeNumber(totalStaked) || 0}
                     </span>
                     <span className="font-luckiest-guy text-xl text-navy mb-2">
                       RWA
