@@ -137,7 +137,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
   const [mounted, setMounted] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("CONNECT WALLET");
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [stakeAmount, setStakeAmount] = useState("0");
+  const [stakeAmount, setStakeAmount] = useState("");
   const [unstakeTimer, setUnstakeTimer] = useState("00:00:00");
   const [canUnstake, setCanUnstake] = useState(false);
   const [timeRemainingSeconds, setTimeRemainingSeconds] = useState(0);
@@ -147,10 +147,12 @@ const VaultCard: React.FC<VaultCardProps> = ({
   const balances = useMemo(
     () => ({
       stakedTokenSupply: userBalances?.stakedTokenSupply || "0",
-      userBalance: userBalances?.tokenBalance || "0",
+      userBalance: userBalances?.tokenBalance || 0,
       userStakedBalance: userBalances?.stakedTokenBalance || "0",
       pendingReward: userBalances?.pendingReward || "0",
-      stakedAmount: userBalances?.stakedTokenAllowance || "0", // This will be updated to actual staked amount
+      stakedAmount: userBalances?.stakedTokenAllowance || "0",
+      stakedTokenBalanceContract:
+        userBalances?.stakedTokenBalanceContract || "0",
     }),
     [userBalances]
   );
@@ -161,7 +163,15 @@ const VaultCard: React.FC<VaultCardProps> = ({
     userStakedBalance,
     pendingReward,
     stakedAmount,
+    stakedTokenBalanceContract,
   } = balances;
+
+  // Check if vault is full
+  const isVaultFull = useMemo(() => {
+    const supply = parseFloat(String(stakedTokenSupply));
+    const contract = parseFloat(String(stakedTokenBalanceContract));
+    return supply >= contract && contract > 0;
+  }, [stakedTokenSupply, stakedTokenBalanceContract]);
 
   const apy = useMemo(() => {
     const apyValue =
@@ -171,8 +181,6 @@ const VaultCard: React.FC<VaultCardProps> = ({
     return apyValue;
   }, [days, userBalances?.fourtyFiveDaysApy, userBalances?.ninetyDaysApy]);
 
-  const maxStakeAmount = useMemo(() => parseFloat(userBalance), [userBalance]);
-
   // Validate stake amount - memoized to prevent recreation
   const validateStakeAmount = useCallback(
     (amount: string) => {
@@ -180,12 +188,12 @@ const VaultCard: React.FC<VaultCardProps> = ({
       if (isNaN(numAmount) || numAmount <= 0) {
         return "Please enter a valid amount greater than 0";
       }
-      if (numAmount > maxStakeAmount) {
+      if (numAmount > userBalance) {
         return `Amount cannot exceed your balance of ${userBalance} ${tokenSymbol}`;
       }
       return null; // Valid
     },
-    [maxStakeAmount, userBalance, tokenSymbol]
+    [userBalance, tokenSymbol]
   );
 
   // Validate unstake operation - memoized to prevent recreation
@@ -305,6 +313,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
       pendingReward: Number(pendingReward) + Number(userStakedBalance),
       userBalance,
       unstakeTime: earliestUnlock,
+      stakedTokenBalanceContract,
     };
     return valueMap[key as keyof typeof valueMap] || 0;
   };
@@ -372,15 +381,19 @@ const VaultCard: React.FC<VaultCardProps> = ({
                   const value = parseFloat(e.target.value) || 0;
                   const clampedValue = Math.min(
                     Math.max(value, 0),
-                    maxStakeAmount
+                    userBalance
                   );
                   setStakeAmount(clampedValue.toString());
                 }}
-                placeholder="0.0"
+                placeholder={isVaultFull ? "Vault Full" : "Enter amount"}
                 min="0"
-                max={maxStakeAmount}
-                disabled={maxStakeAmount === 0}
-                className="h-fit p-0 text-xl md:text-5xl m-0 leading-0 font-normal bg-transparent border-none outline-none w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 transition-all duration-200 ease-in-out focus:scale-[1.02] w-full"
+                max={userBalance}
+                disabled={userBalance === 0 || isVaultFull}
+                className={`h-fit p-0 text-xl md:text-5xl m-0 leading-0 font-normal bg-transparent border-none outline-none w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 transition-all duration-200 ease-in-out focus:scale-[1.02] w-full placeholder:font-semibold placeholder:text-lg md:placeholder:text-2xl placeholder:opacity-80 ${
+                  isVaultFull
+                    ? "placeholder:text-[#0036ae] placeholder:opacity-100"
+                    : "placeholder:text-gray-600"
+                }`}
               />
             </span>
           </div>
@@ -574,6 +587,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
             }
           })}
         </div>
+
         <div
           className={`w-full flex ${
             days === 45 ? "justify-start" : "justify-end md:justify-start"
@@ -586,6 +600,13 @@ const VaultCard: React.FC<VaultCardProps> = ({
               } else {
                 switch (activeButton) {
                   case "stake":
+                    if (isVaultFull) {
+                      showToast(
+                        "info",
+                        "This vault is full. No new stakes can be added."
+                      );
+                      return;
+                    }
                     const stakeValidationError =
                       validateStakeAmount(stakeAmount);
                     if (stakeValidationError) {
@@ -620,16 +641,28 @@ const VaultCard: React.FC<VaultCardProps> = ({
                 }
               }
             }}
-            disabled={activeButton === "unstake" && !canUnstake}
+            disabled={
+              (activeButton === "unstake" && !canUnstake) ||
+              (activeButton === "stake" && isVaultFull)
+            }
             className={cn(
               "w-max md:w-fit border-2 bg-gradient-to-r from-[#1AD3E4] to-[#005FEB] border-secondary px-2.5 sm:px-4 md:px-6 py-2 lg:py-1.5 rounded-xl xs:rounded-2xl lg:rounded-lg font-luckiest-guy transition-opacity text-white text-nowrap md:text-xl lg:text-lg",
-              activeButton === "unstake" && !canUnstake
-                ? "cursor-not-allowed opacity-50"
+              (activeButton === "unstake" && !canUnstake) ||
+                (activeButton === "stake" && isVaultFull)
+                ? "cursor-not-allowed opacity-50 bg-gradient-to-r from-gray-500 to-gray-600"
                 : " btn-shine  cursor-pointer hover:opacity-90"
             )}
           >
             {buttonLabel}
           </button>
+          {/* Simple vault full indicator */}
+          {isVaultFull && (
+            <div className="w-full mt-2 ml-2">
+              <span className="italic inline-flex items-center px-3 py-1 rounded-full text-sm md:text-base font-medium text-[#0036ae] animate-pulse hover:animate-bounce transition-all duration-300 hover:scale-105">
+                🚫 Vault Full - No New Stakes. Come back for Vault 2.
+              </span>
+            </div>
+          )}
         </div>
       </div>
     );
