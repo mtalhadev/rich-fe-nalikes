@@ -303,6 +303,8 @@ export const useWalletOperations = () => {
 
       // Set pending execution to wait for gas estimate
       setPendingStakingExecution(stakingAmount);
+
+      refetchStakingGas();
     }
   }, [isApprovalSuccess, isStakingFlowActive, stakingAmount]);
 
