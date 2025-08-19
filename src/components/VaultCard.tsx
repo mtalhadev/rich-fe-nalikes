@@ -137,7 +137,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
   const [mounted, setMounted] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("CONNECT WALLET");
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [stakeAmount, setStakeAmount] = useState("0");
+  const [stakeAmount, setStakeAmount] = useState("");
   const [unstakeTimer, setUnstakeTimer] = useState("00:00:00");
   const [canUnstake, setCanUnstake] = useState(false);
   const [timeRemainingSeconds, setTimeRemainingSeconds] = useState(0);
@@ -374,11 +374,11 @@ const VaultCard: React.FC<VaultCardProps> = ({
                   );
                   setStakeAmount(clampedValue.toString());
                 }}
-                placeholder="0.0"
+                placeholder="Enter amount"
                 min="0"
                 max={userBalance}
                 disabled={userBalance === 0}
-                className="h-fit p-0 text-xl md:text-5xl m-0 leading-0 font-normal bg-transparent border-none outline-none w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 transition-all duration-200 ease-in-out focus:scale-[1.02] w-full"
+                className="h-fit p-0 text-xl md:text-5xl m-0 leading-0 font-normal bg-transparent border-none outline-none w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 transition-all duration-200 ease-in-out focus:scale-[1.02] w-full placeholder:text-gray-600 placeholder:font-semibold placeholder:text-lg md:placeholder:text-2xl placeholder:opacity-80"
               />
             </span>
           </div>
