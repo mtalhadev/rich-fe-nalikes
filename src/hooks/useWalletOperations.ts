@@ -597,20 +597,12 @@ export const useWalletOperations = () => {
         setStakingAmount(amount);
         setIsStakingFlowActive(true);
 
-        // Use standard gas limit for approval (ERC20 approve is predictable)
-        const approvalGasLimit = BigInt(100000); // 100k gas for approval
-        console.log(
-          "Using standard approval gas limit:",
-          approvalGasLimit.toString()
-        );
-
         // Execute approval using hook with gas limit
         writeTokenContract({
           address: stakedTokenAddress as `0x${string}`,
           abi: erc20Abi,
           functionName: "approve",
           args: [STAKING_CONTRACT_ADDRESS as `0x${string}`, amountToDeposit],
-          gas: approvalGasLimit,
         });
       } else {
         // Sufficient allowance, proceed directly to staking
