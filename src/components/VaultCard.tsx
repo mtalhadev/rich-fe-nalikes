@@ -170,7 +170,8 @@ const VaultCard: React.FC<VaultCardProps> = ({
   const isVaultFull = useMemo(() => {
     const supply = parseFloat(String(stakedTokenSupply));
     const contract = parseFloat(String(stakedTokenBalanceContract));
-    return supply >= contract && contract > 0;
+    return true;
+    // return supply >= contract && contract > 0;
   }, [stakedTokenSupply, stakedTokenBalanceContract]);
 
   const apy = useMemo(() => {
