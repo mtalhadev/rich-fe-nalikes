@@ -5,12 +5,13 @@ import {
   useWriteContract,
   useReadContract,
   useWalletClient,
+  useEstimateGas,
   useWaitForTransactionReceipt,
 } from "wagmi";
 import { TARGET_CHAIN } from "@/config/chains";
 import { showToast } from "@/components/CustomToast";
 import { ethers } from "ethers";
-import { erc20Abi } from "viem";
+import { erc20Abi, encodeFunctionData } from "viem";
 import {
   STAKING_CONTRACT_ABI,
   STAKING_CONTRACT_ADDRESS,
@@ -59,6 +60,9 @@ export const useWalletOperations = () => {
   // State for staking flow
   const [stakingAmount, setStakingAmount] = useState<string>("");
   const [isStakingFlowActive, setIsStakingFlowActive] = useState(false);
+  const [pendingStakingExecution, setPendingStakingExecution] = useState<
+    string | null
+  >(null);
 
   // Helper function to get user-friendly error messages
   const getErrorMessage = (error: any, action: string): string => {
@@ -238,6 +242,27 @@ export const useWalletOperations = () => {
     error: approvalError,
   } = useWriteContract();
 
+  // Gas estimation hooks
+  const {
+    data: stakingGasEstimate,
+    isError: isStakingGasError,
+    error: stakingGasError,
+    refetch: refetchStakingGas,
+  } = useEstimateGas({
+    to: STAKING_CONTRACT_ADDRESS as `0x${string}`,
+    data:
+      stakingAmount && tokenDecimals
+        ? encodeFunctionData({
+            abi: STAKING_CONTRACT_ABI,
+            functionName: "deposit",
+            args: [ethers.parseUnits(stakingAmount, tokenDecimals)],
+          })
+        : undefined,
+    query: {
+      enabled: !!STAKING_CONTRACT_ADDRESS && !!stakingAmount && !!tokenDecimals,
+    },
+  });
+
   // Transaction status tracking hooks
   const {
     isLoading: isApprovalConfirming,
@@ -267,16 +292,66 @@ export const useWalletOperations = () => {
     }
   }, [approvalError]);
 
-  // Handle approval success - automatically proceed to staking
+  // useEffect to handle approval success and trigger staking
   useEffect(() => {
     if (isApprovalSuccess && isStakingFlowActive && stakingAmount) {
-      console.log("Approval successful, proceeding with staking...");
-      showToast("success", "Approval confirmed! Proceeding with staking...");
+      console.log("Approval successful, waiting for gas estimate...");
+      showToast(
+        "success",
+        "Approval confirmed! Preparing staking transaction..."
+      );
 
-      // Execute staking with the stored amount
-      executeStaking(stakingAmount);
+      // Set pending execution to wait for gas estimate
+      setPendingStakingExecution(stakingAmount);
     }
   }, [isApprovalSuccess, isStakingFlowActive, stakingAmount]);
+
+  // useEffect to detect when gas estimate is ready and execute staking
+  useEffect(() => {
+    console.log("Gas estimation useEffect triggered:", {
+      pendingStakingExecution,
+      stakingAmount,
+      stakingGasEstimate: stakingGasEstimate?.toString(),
+      isStakingGasError,
+      isStakingFlowActive,
+      hasAllConditions: !!(
+        pendingStakingExecution &&
+        stakingAmount &&
+        stakingGasEstimate &&
+        !isStakingGasError &&
+        isStakingFlowActive
+      ),
+    });
+
+    if (
+      pendingStakingExecution &&
+      stakingAmount &&
+      stakingGasEstimate &&
+      !isStakingGasError &&
+      isStakingFlowActive
+    ) {
+      console.log(
+        "Gas estimate ready, executing staking for amount:",
+        pendingStakingExecution
+      );
+      setPendingStakingExecution(null); // Clear pending execution
+      executeStaking(pendingStakingExecution);
+    } else {
+      console.log("Gas estimation useEffect conditions not met:", {
+        hasPendingExecution: !!pendingStakingExecution,
+        hasStakingAmount: !!stakingAmount,
+        hasGasEstimate: !!stakingGasEstimate,
+        hasNoGasError: !isStakingGasError,
+        isFlowActive: isStakingFlowActive,
+      });
+    }
+  }, [
+    pendingStakingExecution,
+    stakingAmount,
+    stakingGasEstimate,
+    isStakingGasError,
+    isStakingFlowActive,
+  ]);
 
   // Handle staking success
   useEffect(() => {
@@ -300,22 +375,23 @@ export const useWalletOperations = () => {
             refetchTokenDecimals(),
             refetchUserTokenBalance(),
             refetchTokenAllowance(),
+            refetchStakingGas(),
           ]);
 
           console.log("All contract data refreshed successfully");
-
-          // Also call the context's fetchUserBalances to format the new data
-          await fetchUserBalances();
         } catch (error) {
           console.error("Error refreshing contract data:", error);
         }
       };
 
-      refreshAllContractData();
+      setTimeout(() => {
+        refreshAllContractData();
+      }, 1000);
 
       // Reset staking flow
       setIsStakingFlowActive(false);
       setStakingAmount("");
+      setPendingStakingExecution(null); // Clear pending execution state
 
       // CRITICAL: Reset all transaction states to prevent false positives on next operation
       console.log("Resetting all transaction states...");
@@ -323,7 +399,7 @@ export const useWalletOperations = () => {
       resetTokenContract();
       // Note: useWaitForTransactionReceipt hooks will automatically reset when their hash changes
     }
-  }, [isStakingSuccess, isStakingFlowActive, fetchUserBalances]);
+  }, [isStakingSuccess, isStakingFlowActive]);
 
   // Handle approval error
   useEffect(() => {
@@ -333,11 +409,22 @@ export const useWalletOperations = () => {
       setIsStakingFlowActive(false);
       setStakingAmount("");
 
+      // Refresh allowance data to get current state
+      console.log(
+        "Refreshing allowance data after approval failure/rejection..."
+      );
+      refetchTokenAllowance();
+
       // Reset transaction states on error too
       resetTokenContract();
       // Note: useWaitForTransactionReceipt hooks will automatically reset when their hash changes
     }
-  }, [isApprovalError, isStakingFlowActive]);
+  }, [
+    isApprovalError,
+    isStakingFlowActive,
+    refetchTokenAllowance,
+    approvalError,
+  ]);
 
   // Handle staking error
   useEffect(() => {
@@ -347,15 +434,26 @@ export const useWalletOperations = () => {
       setIsStakingFlowActive(false);
       setStakingAmount("");
 
+      // Always refresh allowance data since staking didn't complete
+      console.log(
+        "Refreshing allowance data after staking failure/rejection..."
+      );
+      refetchTokenAllowance();
+
       // Reset transaction states on error too
       resetStakingContract();
       // Note: useWaitForTransactionReceipt hooks will automatically reset when their hash changes
     }
-  }, [isStakingError, isStakingFlowActive]);
+  }, [
+    isStakingError,
+    isStakingFlowActive,
+    refetchTokenAllowance,
+    stakingError,
+  ]);
 
   // Function to execute staking after approval
   const executeStaking = (amount: string) => {
-    if (!stakedTokenAddress || !tokenDecimals) {
+    if (!stakedTokenAddress || !tokenDecimals || !STAKING_CONTRACT_ADDRESS) {
       showToast("error", "Token information not available");
       setIsStakingFlowActive(false);
       setStakingAmount("");
@@ -367,11 +465,30 @@ export const useWalletOperations = () => {
     console.log("Executing staking with amount:", amountToDeposit.toString());
     showToast("info", "Executing staking transaction...");
 
+    // Use gas estimate from hook if available, otherwise use fallback
+    let gasLimit: bigint;
+
+    if (stakingGasEstimate && !isStakingGasError) {
+      // Add 20% buffer to the estimated gas
+      gasLimit = (stakingGasEstimate * BigInt(120)) / BigInt(100);
+      console.log("Using estimated gas with 20% buffer:", gasLimit.toString());
+    } else {
+      // Fallback to hardcoded gas limit
+      gasLimit = BigInt(500000); // 500k gas
+      console.log("Using fallback gas limit:", gasLimit.toString());
+
+      if (stakingGasError) {
+        console.log("Gas estimation error:", stakingGasError);
+      }
+    }
+
+    // Execute staking with determined gas limit
     writeStakingContract({
       address: STAKING_CONTRACT_ADDRESS as `0x${string}`,
       abi: STAKING_CONTRACT_ABI,
       functionName: "deposit",
       args: [amountToDeposit],
+      gas: gasLimit,
     });
   };
 
@@ -390,12 +507,10 @@ export const useWalletOperations = () => {
         refetchTokenDecimals(),
         refetchUserTokenBalance(),
         refetchTokenAllowance(),
+        refetchStakingGas(),
       ]);
 
       console.log("Manual contract data refresh completed");
-
-      // Also call the context's fetchUserBalances to format the new data
-      await fetchUserBalances();
     } catch (error) {
       console.error("Error manually refreshing contract data:", error);
     }
@@ -403,6 +518,15 @@ export const useWalletOperations = () => {
 
   // Common operations that can be used across components
   const handleStake = async (amount: string) => {
+    console.log("=== HANDLE STAKE CALLED ===");
+    console.log("Current state:", {
+      isConnected,
+      stakingAmount,
+      isStakingFlowActive,
+      pendingStakingExecution,
+      hasStakingContract: !!STAKING_CONTRACT_ADDRESS,
+    });
+
     if (!isConnected) {
       connectWallet();
       return;
@@ -464,32 +588,39 @@ export const useWalletOperations = () => {
         return;
       }
 
-      // Check allowance
-      if (tokenAllowance === undefined) {
-        showToast("error", "Failed to get allowance");
-        return;
-      }
-
-      // Store amount for later use in the flow
-      setStakingAmount(amount);
-      setIsStakingFlowActive(true);
-
-      // If allowance is insufficient, approve first
-      if (tokenAllowance < amountToDeposit) {
-        console.log("Approving tokens for staking contract...");
+      // Check allowance using hook data
+      if (tokenAllowance !== undefined && tokenAllowance < amountToDeposit) {
+        console.log("Approval needed - setting up approval flow");
         showToast("info", "Approving tokens for staking contract...");
 
+        // Set staking flow state
+        setStakingAmount(amount);
+        setIsStakingFlowActive(true);
+
+        // Use standard gas limit for approval (ERC20 approve is predictable)
+        const approvalGasLimit = BigInt(100000); // 100k gas for approval
+        console.log(
+          "Using standard approval gas limit:",
+          approvalGasLimit.toString()
+        );
+
+        // Execute approval using hook with gas limit
         writeTokenContract({
           address: stakedTokenAddress as `0x${string}`,
           abi: erc20Abi,
           functionName: "approve",
           args: [STAKING_CONTRACT_ADDRESS as `0x${string}`, amountToDeposit],
+          gas: approvalGasLimit,
         });
-
-        // Don't return here - let the useEffect handle the flow
       } else {
-        // If allowance is sufficient, proceed directly to staking
-        executeStaking(amount);
+        // Sufficient allowance, proceed directly to staking
+        console.log("Sufficient allowance - setting up direct staking flow");
+        setStakingAmount(amount);
+        setIsStakingFlowActive(true);
+
+        // Set pending execution to wait for gas estimate
+        setPendingStakingExecution(amount);
+        console.log("Pending execution set for amount:", amount);
       }
     } catch (error) {
       console.error("Error in staking flow:", error);
@@ -497,6 +628,8 @@ export const useWalletOperations = () => {
       setIsStakingFlowActive(false);
       setStakingAmount("");
     }
+
+    console.log("=== HANDLE STAKE COMPLETED ===");
   };
 
   const handleUnstake = async () => {
