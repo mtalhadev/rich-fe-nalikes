@@ -23,7 +23,7 @@ export default function Page() {
         setIsStakingPopupOpen={setIsStakingPopupOpen}
       />
       {/* Staking Section */}
-      <TotalStakedSection onStakeClick={() => setIsStakingPopupOpen(true)} />
+      {/* <TotalStakedSection onStakeClick={() => setIsStakingPopupOpen(true)} /> */}
 
       {/* RWA Separator */}
       {/* <RWASeperator /> */}
